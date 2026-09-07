@@ -1,0 +1,23 @@
+{
+  "name": "digital-health-coordination",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ministry of Health Digital Health Platform",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "build": "npm --prefix frontend run build",
+    "build:backend": "npm --prefix backend run build",
+    "start": "npm --prefix frontend run start",
+    "test": "npm --prefix backend test"
+  },
+  "keywords": [
+    "healthcare",
+    "nextjs",
+    "express",
+    "typescript"
+  ],
+  "author": "Ministry of Health Digital Health Division",
+  "license": "UNLICENSED"
+}
