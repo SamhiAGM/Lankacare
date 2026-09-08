@@ -23,10 +23,8 @@ export const connectDB = async (): Promise<void> => {
     // Never log raw connection string or credentials
     logger.info(`MongoDB Connected safely: Cluster host ${conn.connection.host}, database: ${conn.connection.name}`);
   } catch (error) {
-    logger.error('MongoDB connection failed. Please verify Atlas network access (IP 0.0.0.0/0) and database credentials in hosting environment variables.');
-    if (config.nodeEnv === 'production') {
-      process.exit(1);
-    }
+    logger.error('MongoDB connection failed. Please verify Atlas network access (IP 0.0.0.0/0) and database credentials in hosting environment variables.', error);
+    // Remove process.exit(1) to prevent Vercel 500 crash
   }
 };
 
