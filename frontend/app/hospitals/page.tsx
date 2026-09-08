@@ -22,6 +22,7 @@ import {
   Hospital, HospitalType, HospitalStatus, SriLankaRegion,
   SriLankaHospitalCategory, UserRole
 } from '@/types';
+import { RoleGuard } from '@/components/auth/RoleGuard';
 import {
   SRI_LANKA_PROVINCES, SRI_LANKA_DISTRICTS,
   formatSriLankanPhone, formatSriLankanDate
@@ -148,7 +149,8 @@ export default function HospitalsDirectoryPage() {
   };
 
   return (
-    <div className="space-y-6 pb-12">
+    <RoleGuard>
+      <div className="space-y-6 pb-12">
       {/* Page Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
         <div>
@@ -788,6 +790,7 @@ export default function HospitalsDirectoryPage() {
           </div>
         </form>
       </Modal>
-    </div>
+      </div>
+    </RoleGuard>
   );
 }

@@ -18,6 +18,7 @@ import {
   getDistrictsByProvince, formatSriLankanPhone
 } from '@/lib/sriLankaGeo';
 import { useLanguage } from '@/context/LanguageContext';
+import { RoleGuard } from '@/components/auth/RoleGuard';
 
 export default function FindCarePage() {
   const { t } = useLanguage();
@@ -88,7 +89,8 @@ export default function FindCarePage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 pb-12">
+    <RoleGuard>
+      <div className="max-w-6xl mx-auto space-y-6 pb-12">
       {/* Header Banner */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-900 via-slate-900 to-slate-950 p-6 sm:p-8 text-white border border-teal-900/40 shadow-xl">
         <div className="relative z-10 max-w-3xl space-y-3">
@@ -370,6 +372,7 @@ export default function FindCarePage() {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </RoleGuard>
   );
 }

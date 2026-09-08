@@ -16,6 +16,7 @@ import { useToast } from '@/context/ToastContext';
 import { getAnnouncements, announcementService } from '@/services/apiClient';
 import { Announcement, AnnouncementCategory, UserRole } from '@/types';
 import { formatDateTime, formatDate } from '@/lib/utils';
+import { RoleGuard } from '@/components/auth/RoleGuard';
 
 export default function AnnouncementsPage() {
   const { user } = useAuth();
@@ -77,7 +78,8 @@ export default function AnnouncementsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <RoleGuard>
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
         <div>
@@ -318,6 +320,7 @@ export default function AnnouncementsPage() {
           </form>
         </Modal>
       )}
-    </div>
+      </div>
+    </RoleGuard>
   );
 }
