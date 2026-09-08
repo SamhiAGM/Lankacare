@@ -145,7 +145,16 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
   customSiteTitle: 'MoH Health Platform API',
 }));
 
-// ── Health Checks (Sections 13 & 14) ─────────────────────────────────────────
+// Section 12: Root Service Status
+app.get('/', (_req, res) => {
+  res.status(200).json({
+    service: 'LankaCare Health Platform API',
+    status: 'online',
+    health: '/api/health',
+    docs: '/api/docs',
+  });
+});
+
 // Section 13: Root Health Check
 app.get('/health', (_req, res) => {
   res.status(200).json({
