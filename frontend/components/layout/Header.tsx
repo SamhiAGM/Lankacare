@@ -84,11 +84,10 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Global Search bar trigger */}
         <button
           onClick={onOpenCommandPalette}
-          className="flex items-center gap-2.5 w-full max-w-sm h-9 px-3 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 border border-slate-200 dark:border-slate-700/60 transition-colors group cursor-pointer min-w-0"
+          className="flex items-center justify-center sm:justify-start gap-2.5 w-9 sm:w-full max-w-sm h-9 p-0 sm:px-3 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 border border-slate-200 dark:border-slate-700/60 transition-colors group cursor-pointer shrink-0 sm:min-w-0"
         >
           <Search className="w-4 h-4 shrink-0 text-slate-400 group-hover:text-teal-600 dark:group-hover:text-teal-400" />
           <span className="truncate hidden sm:inline-block">Search health services, hospitals, doctors...</span>
-          <span className="truncate sm:hidden">Search...</span>
           <kbd className="hidden sm:inline-flex shrink-0 items-center rounded bg-white dark:bg-slate-900 px-1.5 py-0.5 text-[10px] font-mono border border-slate-200 dark:border-slate-700 text-slate-500 ml-auto">
             Ctrl+K
           </kbd>
@@ -113,7 +112,7 @@ export const Header: React.FC<HeaderProps> = ({
         )}
 
         {/* Language Selector */}
-        <div className="relative" ref={langRef}>
+        <div className="relative hidden sm:block" ref={langRef}>
           <button
             onClick={() => setIsLangOpen(!isLangOpen)}
             className="flex items-center gap-1 p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-xs font-medium cursor-pointer"
@@ -151,7 +150,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          className="hidden sm:flex p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           aria-label="Toggle dark mode"
         >
           {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-amber-400" />}
