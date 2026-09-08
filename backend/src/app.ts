@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
 import swaggerUi from 'swagger-ui-express';
+import { injectSpeedInsights } from '@vercel/speed-insights';
 import { config } from './config/config';
 import { getDatabaseHealth } from './config/database';
 import { errorHandler, notFound } from './middleware/errorMiddleware';
@@ -28,6 +29,9 @@ import campaignRoutes from './routes/campaignRoutes';
 import reportRoutes from './routes/reportRoutes';
 
 const app = express();
+
+// ── Vercel Speed Insights ─────────────────────────────────────────────────────
+injectSpeedInsights();
 
 // ── Security Middleware ──────────────────────────────────────────────────────
 app.use(helmet({
