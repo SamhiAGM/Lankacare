@@ -84,11 +84,12 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Global Search bar trigger */}
         <button
           onClick={onOpenCommandPalette}
-          className="flex items-center gap-2.5 w-full max-w-sm h-9 px-3 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 border border-slate-200 dark:border-slate-700/60 transition-colors group cursor-pointer"
+          className="flex items-center gap-2.5 w-full max-w-sm h-9 px-3 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 border border-slate-200 dark:border-slate-700/60 transition-colors group cursor-pointer min-w-0"
         >
-          <Search className="w-4 h-4 text-slate-400 group-hover:text-teal-600 dark:group-hover:text-teal-400" />
-          <span className="truncate">Search health services, hospitals, doctors...</span>
-          <kbd className="hidden sm:inline-flex items-center rounded bg-white dark:bg-slate-900 px-1.5 py-0.5 text-[10px] font-mono border border-slate-200 dark:border-slate-700 text-slate-500 ml-auto">
+          <Search className="w-4 h-4 shrink-0 text-slate-400 group-hover:text-teal-600 dark:group-hover:text-teal-400" />
+          <span className="truncate hidden sm:inline-block">Search health services, hospitals, doctors...</span>
+          <span className="truncate sm:hidden">Search...</span>
+          <kbd className="hidden sm:inline-flex shrink-0 items-center rounded bg-white dark:bg-slate-900 px-1.5 py-0.5 text-[10px] font-mono border border-slate-200 dark:border-slate-700 text-slate-500 ml-auto">
             Ctrl+K
           </kbd>
         </button>
@@ -165,7 +166,7 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <Bell className="w-4 h-4" />
             {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center ring-2 ring-white dark:ring-slate-900">
+              <span className="absolute top-0 right-0 w-3.5 h-3.5 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center ring-2 ring-white dark:ring-slate-900 translate-x-1/4 -translate-y-1/4">
                 {unreadCount}
               </span>
             )}

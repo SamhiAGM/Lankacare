@@ -5,6 +5,7 @@ import { LanguageProvider } from '@/context/LanguageContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { ToastProvider } from '@/context/ToastContext';
 import { AppShell } from '@/components/layout/AppShell';
+import { GlobalAuthGuard } from '@/components/auth/GlobalAuthGuard';
 
 export const metadata: Metadata = {
   title: 'LankaCare — Sri Lanka Digital Health Platform',
@@ -41,7 +42,9 @@ export default function RootLayout({
           <LanguageProvider>
             <AuthProvider>
               <ToastProvider>
-                <AppShell>{children}</AppShell>
+                <GlobalAuthGuard>
+                  <AppShell>{children}</AppShell>
+                </GlobalAuthGuard>
               </ToastProvider>
             </AuthProvider>
           </LanguageProvider>
