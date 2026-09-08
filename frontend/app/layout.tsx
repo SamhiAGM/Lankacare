@@ -6,6 +6,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import { ToastProvider } from '@/context/ToastContext';
 import { AppShell } from '@/components/layout/AppShell';
 import { GlobalAuthGuard } from '@/components/auth/GlobalAuthGuard';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata: Metadata = {
   title: 'LankaCare — Sri Lanka Digital Health Platform',
@@ -49,6 +50,7 @@ export default function RootLayout({
             </AuthProvider>
           </LanguageProvider>
         </ThemeProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
