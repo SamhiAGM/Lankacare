@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Activity, User, Mail, Phone, Lock, CreditCard, ArrowRight } from 'lucide-react';
+import { Activity, User, Mail, Phone, Lock, CreditCard, ArrowRight, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/context/AuthContext';
@@ -17,6 +17,7 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: '',
     nic: '',
+    dateOfBirth: '',
     email: '',
     phone: '',
     password: '',
@@ -48,6 +49,7 @@ export default function RegisterPage() {
       await register({
         name: formData.name,
         nic: formData.nic,
+        dateOfBirth: formData.dateOfBirth,
         email: formData.email,
         phone: formData.phone,
         password: formData.password,
@@ -102,6 +104,15 @@ export default function RegisterPage() {
               onChange={(e) => setFormData({ ...formData, nic: e.target.value })}
               required
               leftIcon={<CreditCard className="w-4 h-4" />}
+            />
+
+            <Input
+              label="Date of Birth"
+              type="date"
+              value={formData.dateOfBirth}
+              onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+              required
+              leftIcon={<Calendar className="w-4 h-4" />}
             />
 
             <Input
