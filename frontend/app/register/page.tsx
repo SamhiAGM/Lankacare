@@ -36,18 +36,26 @@ export default function RegisterPage() {
       return;
     }
 
+    const isNIC = /^[0-9]{9}[vVxX]|[0-9]{12}$/.test(formData.nic);
+    if (!isNIC) {
+      setError('Invalid NIC format. Use 9 digits + V or 12 digits.');
+      return;
+    }
+
     setError('');
     setIsLoading(true);
     try {
       await register({
         name: formData.name,
+        nic: formData.nic,
         email: formData.email,
         phone: formData.phone,
+        password: formData.password,
       });
       toast.success('Registration completed', 'Citizen Account Created');
-      router.push('/appointments');
-    } catch {
-      setError('Failed to create account. Please check your information.');
+      router.push('/citizen'); // Assuming the home URL for citizen is /citizen
+    } catch (err: any) {
+      setError(err.message || 'Failed to create account. Please check your information.');
     } finally {
       setIsLoading(false);
     }

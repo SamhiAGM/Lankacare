@@ -3,155 +3,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, UserRole } from '../types';
 
-import { SriLankaRegion } from '../types';
-import { ROLE_DEFAULT_PERMISSIONS } from '@/lib/rbac';
-import { auditLogService } from '@/services/apiClient';
-
-export const DEMO_ACCOUNTS: Record<UserRole, User> = {
-  [UserRole.CITIZEN]: {
-    id: 'user-citizen',
-    name: 'Sunil Wickramasinghe',
-    email: 'citizen@example.com',
-    role: UserRole.CITIZEN,
-    phone: '+94 77 234 1122',
-    organization: 'Sri Lanka Public Health Citizen',
-    isVerified: true,
-    scope: { level: 'DISTRICT', district: 'Colombo', province: SriLankaRegion.WESTERN },
-    permissions: ROLE_DEFAULT_PERMISSIONS[UserRole.CITIZEN],
-  },
-  [UserRole.DOCTOR]: {
-    id: 'user-doctor',
-    name: 'Dr. Amara Bandara',
-    email: 'doctor@example.com',
-    role: UserRole.DOCTOR,
-    phone: '+94 77 123 4567',
-    organization: 'Base Hospital Kinniya',
-    hospitalId: 'hosp-kinniya',
-    department: 'General Medicine',
-    isVerified: true,
-    scope: { level: 'HOSPITAL', hospitalId: 'hosp-kinniya', department: 'General Medicine', district: 'Trincomalee', province: SriLankaRegion.EASTERN },
-    permissions: ROLE_DEFAULT_PERMISSIONS[UserRole.DOCTOR],
-    assignedRoles: [UserRole.DOCTOR, UserRole.HOSPITAL_ADMIN],
-  },
-  [UserRole.NURSE]: {
-    id: 'user-nurse',
-    name: 'Nurse Samanthi Jayakody',
-    email: 'nurse@example.com',
-    role: UserRole.NURSE,
-    phone: '+94 71 889 0012',
-    organization: 'Base Hospital Kinniya',
-    hospitalId: 'hosp-kinniya',
-    department: 'Ward 3 (Female Medical)',
-    isVerified: true,
-    scope: { level: 'DEPARTMENT', hospitalId: 'hosp-kinniya', department: 'Ward 3', district: 'Trincomalee', province: SriLankaRegion.EASTERN },
-    permissions: ROLE_DEFAULT_PERMISSIONS[UserRole.NURSE],
-  },
-  [UserRole.HEALTH_WORKER]: {
-    id: 'user-health-worker',
-    name: 'K. P. Thilakarathne',
-    email: 'phi.trinco@example.com',
-    role: UserRole.HEALTH_WORKER,
-    phone: '+94 71 334 5566',
-    organization: 'RDHS Trincomalee — Field Inspection Unit',
-    isVerified: true,
-    scope: { level: 'DISTRICT', district: 'Trincomalee', province: SriLankaRegion.EASTERN },
-    permissions: ROLE_DEFAULT_PERMISSIONS[UserRole.HEALTH_WORKER],
-  },
-  [UserRole.PHARMACIST]: {
-    id: 'user-pharmacist',
-    name: 'M. Farhan',
-    email: 'pharmacist@example.com',
-    role: UserRole.PHARMACIST,
-    phone: '+94 26 223 6265',
-    organization: 'Base Hospital Kinniya — Pharmacy Depot',
-    hospitalId: 'hosp-kinniya',
-    department: 'Outpatient & Ward Pharmacy',
-    isVerified: true,
-    scope: { level: 'HOSPITAL', hospitalId: 'hosp-kinniya', department: 'Pharmacy', district: 'Trincomalee', province: SriLankaRegion.EASTERN },
-    permissions: ROLE_DEFAULT_PERMISSIONS[UserRole.PHARMACIST],
-  },
-  [UserRole.HOSPITAL_ADMIN]: {
-    id: 'user-hospital-admin',
-    name: 'Dr. K. M. Nafeel',
-    email: 'hospital@example.com',
-    role: UserRole.HOSPITAL_ADMIN,
-    phone: '+94 26 223 6261',
-    organization: 'Base Hospital Kinniya',
-    hospitalId: 'hosp-kinniya',
-    isVerified: true,
-    scope: { level: 'HOSPITAL', hospitalId: 'hosp-kinniya', district: 'Trincomalee', province: SriLankaRegion.EASTERN },
-    permissions: ROLE_DEFAULT_PERMISSIONS[UserRole.HOSPITAL_ADMIN],
-    assignedRoles: [UserRole.HOSPITAL_ADMIN, UserRole.DOCTOR],
-  },
-  [UserRole.DISTRICT_ADMIN]: {
-    id: 'user-dist-admin',
-    name: 'Dr. Ruwan Gunawardana',
-    email: 'trinco.rdhs@example.com',
-    role: UserRole.DISTRICT_ADMIN,
-    phone: '+94 26 222 2244',
-    organization: 'Regional Directorate of Health Services (RDHS) — Trincomalee',
-    isVerified: true,
-    scope: { level: 'DISTRICT', district: 'Trincomalee', province: SriLankaRegion.EASTERN },
-    permissions: ROLE_DEFAULT_PERMISSIONS[UserRole.DISTRICT_ADMIN],
-  },
-  [UserRole.PROVINCIAL_ADMIN]: {
-    id: 'user-prov-admin',
-    name: 'Dr. Chandani Jayaratne',
-    email: 'eastern.pdhs@example.com',
-    role: UserRole.PROVINCIAL_ADMIN,
-    phone: '+94 65 222 2311',
-    organization: 'Provincial Directorate of Health Services (PDHS) — Eastern Province',
-    isVerified: true,
-    scope: { level: 'PROVINCE', province: SriLankaRegion.EASTERN },
-    permissions: ROLE_DEFAULT_PERMISSIONS[UserRole.PROVINCIAL_ADMIN],
-  },
-  [UserRole.MINISTRY_OFFICER]: {
-    id: 'user-ministry-officer',
-    name: 'Dr. Priya Kumara',
-    email: 'ministry.officer@example.com',
-    role: UserRole.MINISTRY_OFFICER,
-    phone: '+94 11 269 8501',
-    organization: 'Ministry of Health — Directorate of Medical Services',
-    isVerified: true,
-    scope: { level: 'NATIONAL' },
-    permissions: ROLE_DEFAULT_PERMISSIONS[UserRole.MINISTRY_OFFICER],
-  },
-  [UserRole.MINISTRY_ADMIN]: {
-    id: 'user-ministry-admin',
-    name: 'Ms. Nirosha Perera',
-    email: 'admin@example.com',
-    role: UserRole.MINISTRY_ADMIN,
-    phone: '+94 11 200 0002',
-    organization: 'Ministry of Health — Digital Health Division',
-    isVerified: true,
-    scope: { level: 'NATIONAL' },
-    permissions: ROLE_DEFAULT_PERMISSIONS[UserRole.MINISTRY_ADMIN],
-    assignedRoles: [UserRole.MINISTRY_ADMIN, UserRole.SUPER_ADMIN],
-  },
-  [UserRole.DATA_ADMIN]: {
-    id: 'user-data-admin',
-    name: 'Saman Jayasuriya',
-    email: 'dataadmin@example.com',
-    role: UserRole.DATA_ADMIN,
-    phone: '+94 11 269 8507',
-    organization: 'Medical Statistics Unit / National Health Data Division',
-    isVerified: true,
-    scope: { level: 'NATIONAL' },
-    permissions: ROLE_DEFAULT_PERMISSIONS[UserRole.DATA_ADMIN],
-  },
-  [UserRole.SUPER_ADMIN]: {
-    id: 'user-super-admin',
-    name: 'Dinesh Alahakoon',
-    email: 'superadmin@example.com',
-    role: UserRole.SUPER_ADMIN,
-    phone: '+94 11 200 0001',
-    organization: 'Ministry of Health — Information Infrastructure & Cybersecurity Division',
-    isVerified: true,
-    scope: { level: 'NATIONAL' },
-    // Strictly infrastructure and audit permissions; zero clinical patient access per Section 67
-    permissions: ROLE_DEFAULT_PERMISSIONS[UserRole.SUPER_ADMIN],
-  },
-};
+interface RegisteredUser extends User {
+  nic?: string;
+  password?: string;
+}
 
 interface AuthContextType {
   user: User | null;
@@ -159,11 +14,16 @@ interface AuthContextType {
   login: (email: string, password?: string) => Promise<boolean>;
   loginAsDemo: (role: UserRole) => void;
   switchRole: (role: UserRole) => void;
-  register: (data: Partial<User> & { password?: string }) => Promise<boolean>;
+  register: (data: Partial<User> & { password?: string; nic?: string }) => Promise<boolean>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const getRegisteredUsers = (): RegisteredUser[] => {
+  const users = localStorage.getItem('moh_registered_users');
+  return users ? JSON.parse(users) : [];
+};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -184,68 +44,53 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const loginAsDemo = (role: UserRole) => {
-    const demoUser = DEMO_ACCOUNTS[role] || DEMO_ACCOUNTS[UserRole.CITIZEN];
-    setUser(demoUser);
-    localStorage.setItem('moh_user', JSON.stringify(demoUser));
-    localStorage.setItem('moh_token', 'demo-jwt-token-valid');
-    auditLogService.log(
-      'USER_LOGIN',
-      'STAFF',
-      demoUser.id,
-      `User ${demoUser.name} logged in under role ${role} (Scope: ${demoUser.scope?.level || 'NATIONAL'})`,
-      demoUser.hospitalId,
-      demoUser.organization
-    );
+    console.warn('Demo accounts have been disabled in this environment.');
   };
 
   const switchRole = (role: UserRole) => {
-    const prevRole = user?.role;
-    const demoUser = DEMO_ACCOUNTS[role] || DEMO_ACCOUNTS[UserRole.CITIZEN];
-    setUser(demoUser);
-    localStorage.setItem('moh_user', JSON.stringify(demoUser));
-    localStorage.setItem('moh_token', 'demo-jwt-token-valid');
-    auditLogService.log(
-      'ROLE_SWITCHED',
-      'STAFF',
-      demoUser.id,
-      `Role switched from ${prevRole} to ${role} by ${demoUser.name} (Authorized Persona Switch)`,
-      demoUser.hospitalId,
-      demoUser.organization
-    );
+    console.warn('Role switching is disabled. Please login with proper credentials.');
   };
 
-  const login = async (identifier: string, _password?: string): Promise<boolean> => {
-    // Check if identifier matches any demo account (by email)
-    const matched = Object.values(DEMO_ACCOUNTS).find(
-      (acc) => acc.email.toLowerCase() === identifier.toLowerCase()
-    );
-
+  const login = async (identifier: string, password?: string): Promise<boolean> => {
     const isNIC = /^[0-9]{9}[vVxX]|[0-9]{12}$/.test(identifier);
-    const mockName = isNIC ? `Citizen (${identifier})` : identifier.split('@')[0];
+    if (!isNIC) {
+      throw new Error('Invalid NIC format. Must be 10 digits+V or 12 digits.');
+    }
 
-    const targetUser: User = matched || {
-      id: `user-${Date.now()}`,
-      name: mockName,
-      email: isNIC ? `${identifier}@citizen.gov.lk` : identifier,
-      role: UserRole.CITIZEN,
-      isVerified: true,
-    };
+    const users = getRegisteredUsers();
+    const matched = users.find(u => u.nic?.toLowerCase() === identifier.toLowerCase() && u.password === password);
 
-    setUser(targetUser);
-    localStorage.setItem('moh_user', JSON.stringify(targetUser));
+    if (!matched) {
+      throw new Error('Invalid NIC or password');
+    }
+
+    setUser(matched);
+    localStorage.setItem('moh_user', JSON.stringify(matched));
     localStorage.setItem('moh_token', 'mock-jwt-token');
     return true;
   };
 
-  const register = async (data: Partial<User>): Promise<boolean> => {
-    const newUser: User = {
+  const register = async (data: Partial<User> & { password?: string; nic?: string }): Promise<boolean> => {
+    const users = getRegisteredUsers();
+    
+    if (users.find(u => u.nic === data.nic)) {
+      throw new Error('NIC is already registered.');
+    }
+
+    const newUser: RegisteredUser = {
       id: `user-${Date.now()}`,
       name: data.name || 'Citizen User',
-      email: data.email || 'citizen@example.com',
+      email: data.email || `${data.nic}@citizen.gov.lk`,
       role: UserRole.CITIZEN,
       phone: data.phone,
+      nic: data.nic,
+      password: data.password,
       isVerified: true,
     };
+    
+    users.push(newUser);
+    localStorage.setItem('moh_registered_users', JSON.stringify(users));
+
     setUser(newUser);
     localStorage.setItem('moh_user', JSON.stringify(newUser));
     localStorage.setItem('moh_token', 'mock-jwt-token');
