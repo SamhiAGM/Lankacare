@@ -169,19 +169,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    // Load existing session or default to Ministry Admin for demonstration
+    // Load existing session if it exists, otherwise stay unauthenticated
     const saved = localStorage.getItem('moh_user');
     if (saved) {
       try {
         setUser(JSON.parse(saved));
       } catch {
-        setUser(DEMO_ACCOUNTS[UserRole.MINISTRY_ADMIN]);
+        setUser(null);
+        localStorage.removeItem('moh_user');
       }
     } else {
-      // Default to Ministry Admin on initial load so the reviewer immediately sees the full platform
-      const defaultUser = DEMO_ACCOUNTS[UserRole.MINISTRY_ADMIN];
-      setUser(defaultUser);
-      localStorage.setItem('moh_user', JSON.stringify(defaultUser));
+      setUser(null);
     }
   }, []);
 
@@ -216,16 +214,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
-  const login = async (email: string, _password?: string): Promise<boolean> => {
-    // Check if email matches any demo account
+  const login = async (identifier: string, _password?: string): Promise<boolean> => {
+    // Check if identifier matches any demo account (by email)
     const matched = Object.values(DEMO_ACCOUNTS).find(
-      (acc) => acc.email.toLowerCase() === email.toLowerCase()
+      (acc) => acc.email.toLowerCase() === identifier.toLowerCase()
     );
+
+    const isNIC = /^[0-9]{9}[vVxX]|[0-9]{12}$/.test(identifier);
+    const mockName = isNIC ? `Citizen (${identifier})` : identifier.split('@')[0];
 
     const targetUser: User = matched || {
       id: `user-${Date.now()}`,
-      name: email.split('@')[0],
-      email,
+      name: mockName,
+      email: isNIC ? `${identifier}@citizen.gov.lk` : identifier,
       role: UserRole.CITIZEN,
       isVerified: true,
     };
