@@ -265,6 +265,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  dateOfBirth?: string;
   role: UserRole;
   phone?: string;
   organization?: string;
