@@ -3,6 +3,10 @@ import { config } from './config';
 import { logger } from '../utils/logger';
 
 export const connectDB = async (): Promise<void> => {
+  if (mongoose.connection.readyState >= 1) {
+    return;
+  }
+
   if (!config.mongoUri) {
     logger.error('MongoDB configuration error: MONGODB_URI environment variable is missing. Real MongoDB Atlas connection string is required in production.');
     if (config.nodeEnv === 'production') {
