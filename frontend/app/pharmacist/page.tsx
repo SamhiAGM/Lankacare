@@ -12,7 +12,6 @@ import { RoleGuard } from '@/components/auth/RoleGuard';
 import { UserRole } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { initialHospitalMedicineInventory, initialMedicines } from '@/services/mockData';
 import { useToast } from '@/context/ToastContext';
 import { auditLogService } from '@/services/apiClient';
 
@@ -25,7 +24,7 @@ export default function PharmacistPortalPage() {
 
   // Scoped strictly to assigned hospital pharmacy
   const [inventory, setInventory] = useState(
-    initialHospitalMedicineInventory.filter((inv) => inv.hospitalId === assignedHospitalId)
+    ([] as any[]).filter((inv) => inv.hospitalId === assignedHospitalId)
   );
 
   const [search, setSearch] = useState('');
@@ -295,3 +294,5 @@ export default function PharmacistPortalPage() {
     </RoleGuard>
   );
 }
+
+

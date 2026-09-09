@@ -12,18 +12,17 @@ import { RoleGuard } from '@/components/auth/RoleGuard';
 import { UserRole } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { initialHospitals, initialHospitalBeds, initialStaff, initialAdmissions } from '@/services/mockData';
 
 export default function HospitalAdminPortalPage() {
   const { user } = useAuth();
   const hospitalId = user?.hospitalId || 'hosp-kinniya';
-  const hospital = initialHospitals.find((h) => h.id === hospitalId) || initialHospitals[0];
+  const hospital = ([] as any[]).find((h) => h.id === hospitalId) || [][0];
 
   const totalBeds = 142; // Official Kinniya reported beds
   const occupiedBeds = 98;
   const occupancyRate = Math.round((occupiedBeds / totalBeds) * 100);
 
-  const activeStaff = initialStaff.filter((s) => s.hospitalId === hospitalId);
+  const activeStaff = ([] as any[]).filter((s) => s.hospitalId === hospitalId);
 
   return (
     <RoleGuard allowedRoles={[UserRole.HOSPITAL_ADMIN, UserRole.SUPER_ADMIN, UserRole.MINISTRY_ADMIN]}>
@@ -197,3 +196,5 @@ export default function HospitalAdminPortalPage() {
     </RoleGuard>
   );
 }
+
+

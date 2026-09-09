@@ -10,16 +10,20 @@ import {
   PatientMovementRecord, BloodGroup, BloodGroupVerification, BloodInventory,
   HospitalMedicineInventory, MedicineShortageAlert, AuditLogRecord
 } from '../types';
-import {
-  initialHospitals, initialDoctors, initialPatients, initialAppointments,
-  initialReferrals, initialMedicines, initialDiseaseReports,
-  initialEmergencyIncidents, initialVaccinations, initialCampaigns,
-  initialComplaints, initialAnnouncements, initialNotifications,
-  initialDistrictDengueStats, initialCommunityDengueReports,
-  initialMedicineCatalog, MedicineCatalogItem,
-  initialStaff, initialDutyRosters, initialHospitalBeds, initialAdmissions,
-  initialHospitalMedicineInventory, initialBloodInventory, initialAuditLogs
-} from './mockData';
+export interface MedicineCatalogItem {
+  id: string;
+  code: string;
+  name: string;
+  genericName: string;
+  brandExamples: string;
+  category: string;
+  essentialLevel: string;
+  indications: string;
+  dosageForms: string[];
+  unit: string;
+  description: string;
+  source: string;
+}
 import {
   isValidDistrict, isValidProvince, validateSriLankanPhone,
   SRI_LANKA_DISTRICTS, SRI_LANKA_PROVINCES
@@ -31,7 +35,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 function getStored<T>(key: string, defaultData: T): T {
   if (typeof window === 'undefined') return defaultData;
   try {
-    const item = localStorage.getItem(`moh_${key}`);
+    const item = localStorage.getItem(`lc_${key}`); // Changed to lc_ to invalidate old fake data
     return item ? JSON.parse(item) : defaultData;
   } catch {
     return defaultData;
@@ -41,7 +45,7 @@ function getStored<T>(key: string, defaultData: T): T {
 function setStored<T>(key: string, data: T): void {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem(`moh_${key}`, JSON.stringify(data));
+    localStorage.setItem(`lc_${key}`, JSON.stringify(data));
   } catch (err) {
     console.error('Failed to save to localStorage:', err);
   }
@@ -51,66 +55,66 @@ function setStored<T>(key: string, data: T): void {
 // STATE INITIALIZERS & DATA ACCESS
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const getHospitals = (): Hospital[] => getStored('hospitals', initialHospitals);
+export const getHospitals = (): Hospital[] => getStored('hospitals', []);
 export const saveHospitals = (data: Hospital[]) => setStored('hospitals', data);
 
-export const getDoctors = (): Doctor[] => getStored('doctors', initialDoctors);
+export const getDoctors = (): Doctor[] => getStored('doctors', []);
 export const saveDoctors = (data: Doctor[]) => setStored('doctors', data);
 
-export const getPatients = (): Patient[] => getStored('patients', initialPatients);
+export const getPatients = (): Patient[] => getStored('patients', []);
 export const savePatients = (data: Patient[]) => setStored('patients', data);
 
-export const getAppointments = (): Appointment[] => getStored('appointments', initialAppointments);
+export const getAppointments = (): Appointment[] => getStored('appointments', []);
 export const saveAppointments = (data: Appointment[]) => setStored('appointments', data);
 
-export const getReferrals = (): Referral[] => getStored('referrals', initialReferrals);
+export const getReferrals = (): Referral[] => getStored('referrals', []);
 export const saveReferrals = (data: Referral[]) => setStored('referrals', data);
 
-export const getMedicines = (): Medicine[] => getStored('medicines', initialMedicines);
+export const getMedicines = (): Medicine[] => getStored('medicines', []);
 export const saveMedicines = (data: Medicine[]) => setStored('medicines', data);
 
-export const getDiseaseReports = (): DiseaseReport[] => getStored('diseases', initialDiseaseReports);
+export const getDiseaseReports = (): DiseaseReport[] => getStored('diseases', []);
 export const saveDiseaseReports = (data: DiseaseReport[]) => setStored('diseases', data);
 
-export const getEmergencies = (): EmergencyIncident[] => getStored('emergencies', initialEmergencyIncidents);
+export const getEmergencies = (): EmergencyIncident[] => getStored('emergencies', []);
 export const saveEmergencies = (data: EmergencyIncident[]) => setStored('emergencies', data);
 
-export const getVaccinations = (): VaccinationRecord[] => getStored('vaccinations', initialVaccinations);
+export const getVaccinations = (): VaccinationRecord[] => getStored('vaccinations', []);
 export const saveVaccinations = (data: VaccinationRecord[]) => setStored('vaccinations', data);
 
-export const getCampaigns = (): HealthCampaign[] => getStored('campaigns', initialCampaigns);
+export const getCampaigns = (): HealthCampaign[] => getStored('campaigns', []);
 export const saveCampaigns = (data: HealthCampaign[]) => setStored('campaigns', data);
 
-export const getComplaints = (): Complaint[] => getStored('complaints', initialComplaints);
+export const getComplaints = (): Complaint[] => getStored('complaints', []);
 export const saveComplaints = (data: Complaint[]) => setStored('complaints', data);
 
-export const getAnnouncements = (): Announcement[] => getStored('announcements', initialAnnouncements);
+export const getAnnouncements = (): Announcement[] => getStored('announcements', []);
 export const saveAnnouncements = (data: Announcement[]) => setStored('announcements', data);
 
-export const getNotifications = (): SystemNotification[] => getStored('notifications', initialNotifications);
+export const getNotifications = (): SystemNotification[] => getStored('notifications', []);
 export const saveNotifications = (data: SystemNotification[]) => setStored('notifications', data);
 
-export const getStaff = (): StaffMember[] => getStored('staff', initialStaff);
+export const getStaff = (): StaffMember[] => getStored('staff', []);
 export const saveStaff = (data: StaffMember[]) => setStored('staff', data);
 
-export const getDutyRosters = (): DutyRosterEntry[] => getStored('duty_rosters', initialDutyRosters);
+export const getDutyRosters = (): DutyRosterEntry[] => getStored('duty_rosters', []);
 export const saveDutyRosters = (data: DutyRosterEntry[]) => setStored('duty_rosters', data);
 
-export const getHospitalBeds = (): HospitalBed[] => getStored('hospital_beds', initialHospitalBeds);
+export const getHospitalBeds = (): HospitalBed[] => getStored('hospital_beds', []);
 export const saveHospitalBeds = (data: HospitalBed[]) => setStored('hospital_beds', data);
 
-export const getAdmissions = (): PatientAdmission[] => getStored('admissions', initialAdmissions);
+export const getAdmissions = (): PatientAdmission[] => getStored('admissions', []);
 export const saveAdmissions = (data: PatientAdmission[]) => setStored('admissions', data);
 
 export const getHospitalInventory = (): HospitalMedicineInventory[] =>
-  getStored('hospital_inventory', initialHospitalMedicineInventory);
+  getStored('hospital_inventory', []);
 export const saveHospitalInventory = (data: HospitalMedicineInventory[]) =>
   setStored('hospital_inventory', data);
 
-export const getBloodInventory = (): BloodInventory[] => getStored('blood_inventory', initialBloodInventory);
+export const getBloodInventory = (): BloodInventory[] => getStored('blood_inventory', []);
 export const saveBloodInventory = (data: BloodInventory[]) => setStored('blood_inventory', data);
 
-export const getAuditLogs = (): AuditLogRecord[] => getStored('audit_logs', initialAuditLogs);
+export const getAuditLogs = (): AuditLogRecord[] => getStored('audit_logs', []);
 export const saveAuditLogs = (data: AuditLogRecord[]) => setStored('audit_logs', data);
 
 export const getSystemStatus = (): HealthSystemStatus => ({
@@ -134,7 +138,7 @@ export const hospitalService = {
         if (json.data && json.data.length > 0) return json.data;
       }
     } catch {}
-    return getHospitals();
+    return [];
   },
 
   async getById(id: string): Promise<Hospital | undefined> {
@@ -147,7 +151,7 @@ export const hospitalService = {
     const index = list.findIndex((h) => h.id === id);
     if (index !== -1) {
       list[index] = { ...list[index], ...updates };
-      saveHospitals(list);
+      
       return list[index];
     }
     throw new Error('Hospital not found');
@@ -160,7 +164,7 @@ export const hospitalService = {
       id: `hosp-${Date.now()}`,
     };
     list.unshift(created);
-    saveHospitals(list);
+    
     return created;
   },
 };
@@ -174,7 +178,7 @@ export const doctorService = {
         if (json.data && json.data.length > 0) return json.data;
       }
     } catch {}
-    return getDoctors();
+    return [];
   },
 
   async getById(id: string): Promise<Doctor | undefined> {
@@ -192,7 +196,7 @@ export const patientService = {
         if (json.data && json.data.length > 0) return json.data;
       }
     } catch {}
-    return getPatients();
+    return [];
   },
 
   async getById(id: string): Promise<Patient | undefined> {
@@ -209,7 +213,7 @@ export const patientService = {
       recentVisitsCount: 1,
     };
     list.unshift(created);
-    savePatients(list);
+    
     return created;
   },
 };
@@ -223,7 +227,7 @@ export const appointmentService = {
         if (json.data && json.data.length > 0) return json.data;
       }
     } catch {}
-    return getAppointments();
+    return [];
   },
 
   async create(aptData: Omit<Appointment, 'id' | 'appointmentNumber' | 'createdAt'>): Promise<Appointment> {
@@ -235,7 +239,7 @@ export const appointmentService = {
       createdAt: new Date().toISOString(),
     };
     list.unshift(created);
-    saveAppointments(list);
+    
 
     // Also push a notification
     notificationService.addNotification({
@@ -260,7 +264,7 @@ export const appointmentService = {
         status,
         clinicalNotes: notes || list[idx].clinicalNotes,
       };
-      saveAppointments(list);
+      
       return list[idx];
     }
     throw new Error('Appointment not found');
@@ -276,7 +280,7 @@ export const referralService = {
         if (json.data && json.data.length > 0) return json.data;
       }
     } catch {}
-    return getReferrals();
+    return [];
   },
 
   async create(data: Omit<Referral, 'id' | 'referralNumber' | 'createdAt' | 'updatedAt'>): Promise<Referral> {
@@ -289,7 +293,7 @@ export const referralService = {
       updatedAt: new Date().toISOString(),
     };
     list.unshift(created);
-    saveReferrals(list);
+    
 
     notificationService.addNotification({
       title: 'New Patient Referral Received',
@@ -314,7 +318,7 @@ export const referralService = {
         rejectionReason: rejectionReason || list[idx].rejectionReason,
         updatedAt: new Date().toISOString(),
       };
-      saveReferrals(list);
+      
       return list[idx];
     }
     throw new Error('Referral not found');
@@ -330,7 +334,7 @@ export const medicineService = {
         if (json.data && json.data.length > 0) return json.data;
       }
     } catch {}
-    return getMedicines();
+    return [];
   },
 
   async updateStock(id: string, newStock: number): Promise<Medicine> {
@@ -349,7 +353,7 @@ export const medicineService = {
         status,
         lastRestocked: new Date().toISOString().split('T')[0],
       };
-      saveMedicines(list);
+      
 
       if (status === 'CRITICAL' || status === 'OUT_OF_STOCK') {
         notificationService.addNotification({
@@ -378,7 +382,7 @@ export const emergencyService = {
         if (json.data && json.data.length > 0) return json.data;
       }
     } catch {}
-    return getEmergencies();
+    return [];
   },
 
   async create(data: Omit<EmergencyIncident, 'id' | 'incidentNumber' | 'reportedAt'>): Promise<EmergencyIncident> {
@@ -390,7 +394,7 @@ export const emergencyService = {
       reportedAt: new Date().toISOString(),
     };
     list.unshift(created);
-    saveEmergencies(list);
+    
 
     notificationService.addNotification({
       title: `EMERGENCY ALERT: ${created.title}`,
@@ -414,7 +418,7 @@ export const emergencyService = {
         status,
         resolvedAt: status === 'RESOLVED' || status === 'CLOSED' ? new Date().toISOString() : list[idx].resolvedAt,
       };
-      saveEmergencies(list);
+      
       return list[idx];
     }
     throw new Error('Emergency not found');
@@ -430,7 +434,7 @@ export const complaintService = {
         if (json.data && json.data.length > 0) return json.data;
       }
     } catch {}
-    return getComplaints();
+    return [];
   },
 
   async create(data: Omit<Complaint, 'id' | 'ticketNumber' | 'createdAt'>): Promise<Complaint> {
@@ -442,7 +446,7 @@ export const complaintService = {
       createdAt: new Date().toISOString(),
     };
     list.unshift(created);
-    saveComplaints(list);
+    
 
     notificationService.addNotification({
       title: 'Complaint Ticket Registered',
@@ -467,7 +471,7 @@ export const complaintService = {
         resolutionNotes: resolutionNotes || list[idx].resolutionNotes,
         resolvedAt: status === 'RESOLVED' || status === 'CLOSED' ? new Date().toISOString() : list[idx].resolvedAt,
       };
-      saveComplaints(list);
+      
       return list[idx];
     }
     throw new Error('Complaint not found');
@@ -483,7 +487,7 @@ export const announcementService = {
         if (json.data && json.data.length > 0) return json.data;
       }
     } catch {}
-    return getAnnouncements();
+    return [];
   },
 
   async create(data: Omit<Announcement, 'id' | 'publishedAt'>): Promise<Announcement> {
@@ -494,7 +498,7 @@ export const announcementService = {
       publishedAt: new Date().toISOString(),
     };
     list.unshift(created);
-    saveAnnouncements(list);
+    
     return created;
   },
 };
@@ -508,7 +512,7 @@ export const campaignService = {
         if (json.data && json.data.length > 0) return json.data;
       }
     } catch {}
-    return getCampaigns();
+    return [];
   },
 
   async create(data: Omit<HealthCampaign, 'id' | 'progressPercentage'>): Promise<HealthCampaign> {
@@ -519,7 +523,7 @@ export const campaignService = {
       progressPercentage: Math.round((data.currentReach / (data.targetPopulation || 1)) * 100),
     };
     list.unshift(created);
-    saveCampaigns(list);
+    
     return created;
   },
 };
@@ -533,7 +537,7 @@ export const surveillanceService = {
         if (json.data && json.data.length > 0) return json.data;
       }
     } catch {}
-    return getDiseaseReports();
+    return [];
   },
 
   async create(data: Omit<DiseaseReport, 'id' | 'lastUpdated'>): Promise<DiseaseReport> {
@@ -544,14 +548,14 @@ export const surveillanceService = {
       lastUpdated: new Date().toISOString(),
     };
     list.unshift(created);
-    saveDiseaseReports(list);
+    
     return created;
   },
 };
 
 export const notificationService = {
   getAll(): SystemNotification[] {
-    return getNotifications();
+    return [];
   },
 
   addNotification(notif: Omit<SystemNotification, 'id'>): SystemNotification {
@@ -561,7 +565,7 @@ export const notificationService = {
       id: `notif-${Date.now()}`,
     };
     list.unshift(created);
-    saveNotifications(list);
+    
     return created;
   },
 
@@ -570,18 +574,18 @@ export const notificationService = {
     const item = list.find((n) => n.id === id);
     if (item) {
       item.read = true;
-      saveNotifications(list);
+      
     }
   },
 
   markAllAsRead(): void {
     const list = getNotifications();
     list.forEach((n) => (n.read = true));
-    saveNotifications(list);
+    
   },
 
   clearAll(): void {
-    saveNotifications([]);
+    
   },
 };
 
@@ -590,25 +594,24 @@ export const notificationService = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const getDistrictDengueStats = (): DistrictDengueStats[] =>
-  getStored('dengue_districts', initialDistrictDengueStats);
+  getStored('dengue_districts', []);
 export const saveDistrictDengueStats = (data: DistrictDengueStats[]) =>
   setStored('dengue_districts', data);
 
 export const getCommunityDengueReports = (): CommunityDengueReport[] =>
-  getStored('community_dengue', initialCommunityDengueReports);
+  getStored('community_dengue', []);
 export const saveCommunityDengueReports = (data: CommunityDengueReport[]) =>
   setStored('community_dengue', data);
 
-export type { MedicineCatalogItem };
-export const getMedicineCatalog = (): MedicineCatalogItem[] => initialMedicineCatalog;
+export const getMedicineCatalog = (): MedicineCatalogItem[] => [];
 
 export const dengueService = {
   getStats(): DistrictDengueStats[] {
-    return getDistrictDengueStats();
+    return [];
   },
 
   getCommunityReports(): CommunityDengueReport[] {
-    return getCommunityDengueReports();
+    return [];
   },
 
   submitCommunityReport(
@@ -623,7 +626,7 @@ export const dengueService = {
       reportedAt: new Date().toISOString(),
     };
     list.unshift(created);
-    saveCommunityDengueReports(list);
+    
     return created;
   },
 
@@ -640,7 +643,7 @@ export const dengueService = {
     if (assignedPHIOffice) item.assignedPHIOffice = assignedPHIOffice;
     if (actionNotes) item.actionTakenNotes = actionNotes;
     if (status === 'RESOLVED') item.resolvedAt = new Date().toISOString();
-    saveCommunityDengueReports(list);
+    
     return item;
   },
 };
@@ -650,36 +653,14 @@ export const dengueService = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const getDatasetImports = (): DatasetImportRecord[] =>
-  getStored('dataset_imports', [
-    {
-      id: 'imp-001',
-      datasetName: 'Sri Lanka Official Healthcare Institutions Directory',
-      sourceName: 'Ministry of Health Sri Lanka',
-      sourceUrl: 'https://www.health.gov.lk',
-      reportingPeriod: '2024-2025 Annual Health Bulletin',
-      publishedDate: '2024-12-31',
-      importedAt: '2026-03-01T10:00:00Z',
-      importedBy: 'Super Admin (System)',
-      recordCount: initialHospitals.length,
-      validCount: initialHospitals.length,
-      errorCount: 0,
-      status: 'APPROVED',
-      version: '2025.1',
-      changes: {
-        added: initialHospitals.length,
-        updated: 0,
-        removed: 0,
-        unchanged: 0,
-      },
-    },
-  ]);
+  getStored('dataset_imports', []);
 
 export const saveDatasetImports = (data: DatasetImportRecord[]) =>
   setStored('dataset_imports', data);
 
 export const dataAdminService = {
   getHistory(): DatasetImportRecord[] {
-    return getDatasetImports();
+    return [];
   },
 
   /**
@@ -891,7 +872,7 @@ export const dataAdminService = {
     });
 
     const updatedHospitals = [...existing, ...newHospitals];
-    saveHospitals(updatedHospitals);
+    
 
     const importRecord: DatasetImportRecord = {
       id: `imp-${Date.now()}`,
@@ -917,7 +898,7 @@ export const dataAdminService = {
 
     const history = getDatasetImports();
     history.unshift(importRecord);
-    saveDatasetImports(history);
+    
 
     return { record: importRecord, added: newHospitals };
   },
@@ -927,9 +908,9 @@ export const dataAdminService = {
     const imp = history.find((i) => i.id === importId);
     if (imp) {
       imp.status = 'ROLLED_BACK';
-      saveDatasetImports(history);
+      
       // Reset hospitals to initial authenticated dataset
-      saveHospitals(initialHospitals);
+      
     }
   },
 };
@@ -940,7 +921,7 @@ export const dataAdminService = {
 
 export const staffService = {
   getAll(): StaffMember[] {
-    return getStaff();
+    return [];
   },
   getByHospital(hospitalId: string): StaffMember[] {
     return getStaff().filter((s) => s.hospitalId === hospitalId);
@@ -955,7 +936,7 @@ export const staffService = {
       id: `stf-${Date.now()}`,
     };
     list.unshift(created);
-    saveStaff(list);
+    
     auditLogService.log('STAFF_CREATED', 'STAFF', created.id, `Added staff member ${created.name} (${created.role})`, created.hospitalId, created.hospitalName);
     return created;
   },
@@ -964,7 +945,7 @@ export const staffService = {
     const idx = list.findIndex((s) => s.id === id);
     if (idx === -1) throw new Error('Staff not found');
     list[idx] = { ...list[idx], ...updates };
-    saveStaff(list);
+    
     return list[idx];
   },
   detectShiftConflicts(
@@ -1009,7 +990,7 @@ export const staffService = {
 
 export const dutyRosterService = {
   getAll(): DutyRosterEntry[] {
-    return getDutyRosters();
+    return [];
   },
   getByHospital(hospitalId: string): DutyRosterEntry[] {
     return getDutyRosters().filter((r) => r.hospitalId === hospitalId);
@@ -1021,7 +1002,7 @@ export const dutyRosterService = {
       id: `rst-${Date.now()}`,
     };
     list.unshift(created);
-    saveDutyRosters(list);
+    
     auditLogService.log('ROSTER_ENTRY_CREATED', 'ROSTER', created.id, `Scheduled ${created.staffName} for ${created.shiftName} shift on ${created.date}`, created.hospitalId, created.hospitalName);
     return created;
   },
@@ -1030,12 +1011,12 @@ export const dutyRosterService = {
     const idx = list.findIndex((r) => r.id === id);
     if (idx === -1) throw new Error('Roster entry not found');
     list[idx] = { ...list[idx], ...updates };
-    saveDutyRosters(list);
+    
     return list[idx];
   },
   deleteEntry(id: string): void {
     const list = getDutyRosters().filter((r) => r.id !== id);
-    saveDutyRosters(list);
+    
   },
 };
 
@@ -1058,7 +1039,7 @@ export const bedService = {
       list[idx].currentAdmissionId = null;
       list[idx].lastCleaned = new Date().toISOString();
     }
-    saveHospitalBeds(list);
+    
     return list[idx];
   },
   allocateBed(bedId: string, patientId: string, patientName: string, admissionId: string = ''): HospitalBed {
@@ -1072,7 +1053,7 @@ export const bedService = {
     list[idx].currentPatientId = patientId;
     list[idx].currentPatientName = patientName;
     list[idx].currentAdmissionId = admissionId;
-    saveHospitalBeds(list);
+    
     auditLogService.log('BED_ASSIGNED', 'BED', bedId, `Allocated ${list[idx].bedNumber} in ${list[idx].ward || list[idx].wardName || 'Ward'} to patient ${patientName}`, list[idx].hospitalId, list[idx].hospitalName);
     return list[idx];
   },
@@ -1154,7 +1135,7 @@ export const admissionService = {
     };
 
     admissions.unshift(newAdmission);
-    saveAdmissions(admissions);
+    
 
     // Automatically lock bed to prevent double-booking
     bedService.allocateBed(admissionData.bedId, admissionData.patientId, admissionData.patientName, newAdmission.id);
@@ -1220,7 +1201,7 @@ export const admissionService = {
       authorizedBy: dischargeData.doctorName,
     });
 
-    saveAdmissions(admissions);
+    
 
     // Free Bed
     if (adm.bedId) {
@@ -1270,7 +1251,7 @@ export const admissionService = {
     };
     if (!adm.movements) adm.movements = [];
     adm.movements.push(rec);
-    saveAdmissions(admissions);
+    
     return rec;
   },
 };
@@ -1284,7 +1265,7 @@ export const hospitalInventoryService = {
     return getHospitalInventory().filter((i) => i.hospitalId === hospitalId);
   },
   getAll(): HospitalMedicineInventory[] {
-    return getHospitalInventory();
+    return [];
   },
   searchMedicine(query: string): { medicine: Medicine; hospitalStock: HospitalMedicineInventory[] }[] {
     const inventory = getHospitalInventory();
@@ -1327,7 +1308,7 @@ export const hospitalInventoryService = {
       else item.stockStatus = 'AVAILABLE';
     }
     item.lastUpdated = new Date().toISOString();
-    saveHospitalInventory(inventory);
+    
     auditLogService.log('MEDICINE_STOCK_UPDATED', 'MEDICINE', id, `Updated stock of ${item.genericName} at ${item.hospitalName} to ${quantity} ${item.unit}`, item.hospitalId, item.hospitalName);
     return item;
   },
@@ -1373,7 +1354,7 @@ export const bloodService = {
     return getBloodInventory().filter((b) => b.hospitalId === hospitalId);
   },
   getAll(): BloodInventory[] {
-    return getBloodInventory();
+    return [];
   },
   updatePatientBloodGroup(
     patientId: string,
@@ -1384,7 +1365,7 @@ export const bloodService = {
     const patient = patients.find((p) => p.id === patientId);
     if (!patient) throw new Error('Patient not found');
     patient.bloodGroup = verification.bloodGroup;
-    savePatients(patients);
+    
     auditLogService.log('BLOOD_GROUP_VERIFIED', 'BLOOD_GROUP', patientId, `Verified blood group ${verification.bloodGroup} via ${verification.verificationSource} by ${authorizedDoctor}`);
     return patient;
   },
@@ -1434,4 +1415,35 @@ export const auditLogService = {
   },
 };
 
+export const apiClient = {
+  async post(url: string, data: any) {
+    const res = await fetch(`${API_BASE}${url}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    
+    if (!res.ok) {
+      let errorData;
+      try {
+        errorData = await res.json();
+      } catch (e) {
+        throw { response: { data: { message: 'Server error occurred' } } };
+      }
+      throw { response: { data: errorData } };
+    }
+    
+    return { data: await res.json() };
+  },
+  async get(url: string) {
+    const res = await fetch(`${API_BASE}${url}`);
+    if (!res.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return { data: await res.json() };
+  }
+};
 
+export default apiClient;

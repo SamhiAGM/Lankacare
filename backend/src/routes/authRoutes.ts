@@ -8,7 +8,29 @@ import {
   updateProfile,
   changePassword,
 } from '../controllers/authController';
+import {
+  requestPasswordReset,
+  verifyOtp,
+  resetPassword,
+} from '../controllers/passwordResetController';
 import { authenticate } from '../middleware/authMiddleware';
+import rateLimit from 'express-rate-limit';
+
+const otpRequestLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 requests per windowMs
+  message: { success: false, message: 'Too many password reset requests from this IP, please try again after 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const otpVerifyLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { success: false, message: 'Too many OTP verification attempts, please try again after 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 const router = Router();
 
@@ -79,5 +101,10 @@ router.post('/logout', authenticate, logout);
 router.get('/me', authenticate, getMe);
 router.patch('/me', authenticate, updateProfile);
 router.post('/change-password', authenticate, changePassword);
+
+// Password Reset & OTP Flow
+router.post('/forgot-password', otpRequestLimiter, requestPasswordReset);
+router.post('/verify-password-reset-otp', otpVerifyLimiter, verifyOtp);
+router.post('/reset-password', resetPassword);
 
 export default router;

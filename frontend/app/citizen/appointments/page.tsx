@@ -11,7 +11,6 @@ import { RoleGuard } from '@/components/auth/RoleGuard';
 import { UserRole } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { initialHospitals } from '@/services/mockData';
 
 interface CitizenAppointment {
   id: string;
@@ -72,7 +71,7 @@ export default function CitizenAppointmentsPage() {
     e.preventDefault();
     setIsSubmitting(true);
     setTimeout(() => {
-      const hosp = initialHospitals.find((h) => h.id === selectedHospital);
+      const hosp = ([] as any[]).find((h) => h.id === selectedHospital);
       const newApt: CitizenAppointment = {
         id: `apt-${Date.now()}`,
         refNumber: `LK-APT-2026-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -236,7 +235,7 @@ export default function CitizenAppointmentsPage() {
                     onChange={(e) => setSelectedHospital(e.target.value)}
                     className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
                   >
-                    {initialHospitals.map((h) => (
+                    {([] as any[]).map((h) => (
                       <option key={h.id} value={h.id}>
                         {h.name} ({h.district} District)
                       </option>
@@ -301,3 +300,5 @@ export default function CitizenAppointmentsPage() {
     </RoleGuard>
   );
 }
+
+

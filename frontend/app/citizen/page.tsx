@@ -8,7 +8,6 @@ import {
   FileText, HeartPulse, Stethoscope, ChevronRight, Lock
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { initialHospitals } from '@/services/mockData';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { RoleGuard } from '@/components/auth/RoleGuard';
@@ -18,7 +17,7 @@ export default function CitizenPortalPage() {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredHospitals = initialHospitals.filter(
+  const filteredHospitals = ([] as any[]).filter(
     (h) =>
       h.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       h.district.toLowerCase().includes(searchTerm.toLowerCase())
@@ -197,7 +196,7 @@ export default function CitizenPortalPage() {
           <div className="flex justify-end pt-2">
             <Link href="/hospitals">
               <span className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1">
-                View All National Hospitals Directory ({initialHospitals.length}+ facilities) →
+                View All National Hospitals Directory ({([] as any[]).length}+ facilities) →
               </span>
             </Link>
           </div>
@@ -219,3 +218,5 @@ export default function CitizenPortalPage() {
     </RoleGuard>
   );
 }
+
+

@@ -99,14 +99,7 @@ export default function DashboardPage() {
   }, [filteredHospitals]);
 
   // Weekly Dengue Trend (Epidemiology Unit Notifications)
-  const surveillanceChartData = [
-    { week: 'Wk 31', Dengue: 2800, Leptospirosis: 480 },
-    { week: 'Wk 32', Dengue: 3200, Leptospirosis: 530 },
-    { week: 'Wk 33', Dengue: 3950, Leptospirosis: 690 },
-    { week: 'Wk 34', Dengue: 4400, Leptospirosis: 780 },
-    { week: 'Wk 35', Dengue: 4620, Leptospirosis: 830 },
-    { week: 'Wk 36 (Current)', Dengue: totalDengueCases || 4820, Leptospirosis: 890 },
-  ];
+  const surveillanceChartData: any[] = [];
 
   return (
     <div className="space-y-6 pb-8">

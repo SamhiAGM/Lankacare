@@ -95,15 +95,25 @@ export default function LoginPage() {
                 leftIcon={<UserCircle2 className="w-4 h-4" />}
               />
 
-              <Input
-                label="Password"
-                type="password"
-                placeholder="••••••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                leftIcon={<Lock className="w-4 h-4" />}
-              />
+              <div className="space-y-1">
+                <Input
+                  label="Password"
+                  type="password"
+                  placeholder="••••••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  leftIcon={<Lock className="w-4 h-4" />}
+                />
+                <div className="flex justify-end">
+                  <Link 
+                    href="/forgot-password" 
+                    className="text-xs text-teal-400 hover:text-teal-300 font-medium transition-colors"
+                  >
+                    Forgot Password?
+                  </Link>
+                </div>
+              </div>
 
               <Button
                 type="submit"

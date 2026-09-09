@@ -12,7 +12,6 @@ import { RoleGuard } from '@/components/auth/RoleGuard';
 import { UserRole } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { initialPatients, initialAppointments, initialReferrals } from '@/services/mockData';
 import { executeBreakGlassAccess, getActiveBreakGlassRecords } from '@/lib/rbac';
 import { useToast } from '@/context/ToastContext';
 
@@ -34,15 +33,15 @@ export default function DoctorPortalPage() {
   const [activeBreakGlass, setActiveBreakGlass] = useState(getActiveBreakGlassRecords());
 
   // Filter scoped patients (patients in doctor's assigned hospital or with emergency break glass)
-  const scopedPatients = initialPatients.slice(0, 4);
+  const scopedPatients = ([] as any[]).slice(0, 4);
 
   // Today's appointments in doctor's clinic
-  const doctorAppointments = initialAppointments.filter(
+  const doctorAppointments = ([] as any[]).filter(
     (a) => a.doctorId === 'doc-001' || a.hospitalId === assignedHospitalId
   ).slice(0, 4);
 
   // Inbound & outbound referrals
-  const doctorReferrals = initialReferrals.filter(
+  const doctorReferrals = ([] as any[]).filter(
     (r) => r.referringHospitalId === assignedHospitalId || r.receivingHospitalId === assignedHospitalId
   ).slice(0, 3);
 
@@ -50,7 +49,7 @@ export default function DoctorPortalPage() {
     e.preventDefault();
     if (!user) return;
 
-    const patient = initialPatients.find((p) => p.id === targetPatientId) || {
+    const patient = ([] as any[]).find((p) => p.id === targetPatientId) || {
       id: targetPatientId,
       name: 'Emergency Inpatient (NHSL)',
     };
@@ -369,3 +368,5 @@ export default function DoctorPortalPage() {
     </RoleGuard>
   );
 }
+
+

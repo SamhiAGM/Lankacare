@@ -11,7 +11,8 @@
     "test": "jest --testEnvironment=node --forceExit",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage --forceExit",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "clean-data": "ts-node scripts/cleanupDemoData.ts"
   },
   "keywords": [
     "healthcare",
@@ -51,6 +52,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.9.5",
     "morgan": "^1.12.0",
+    "nodemailer": "^10.0.1",
     "socket.io": "^4.8.3",
     "swagger-ui-express": "^5.0.1",
     "uuid": "^14.0.2",
@@ -65,6 +67,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
     "@types/node": "^26.5.0",
+    "@types/nodemailer": "^8.0.1",
     "@types/supertest": "^7.2.1",
     "@types/swagger-ui-express": "^4.1.8",
     "@types/uuid": "^10.0.0",

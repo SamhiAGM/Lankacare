@@ -16,7 +16,6 @@ import { Doctor } from '@/types';
 
 import { useAuth } from '@/context/AuthContext';
 import { UserRole } from '@/types';
-import { initialPatients } from '@/services/mockData';
 
 export default function StaffDirectoryPage() {
   const { user } = useAuth();
@@ -153,7 +152,7 @@ export default function StaffDirectoryPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {initialPatients.slice(0, 4).map((p, idx) => (
+                  {([] as any[]).slice(0, 4).map((p, idx) => (
                     <tr key={p.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
                       <td className="px-4 py-3 font-mono font-bold text-teal-600 dark:text-teal-400">
                         Bed 0{idx + 1}
@@ -357,3 +356,5 @@ export default function StaffDirectoryPage() {
     </div>
   );
 }
+
+

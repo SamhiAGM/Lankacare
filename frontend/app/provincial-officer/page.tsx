@@ -11,7 +11,6 @@ import { RoleGuard } from '@/components/auth/RoleGuard';
 import { UserRole } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { initialHospitals } from '@/services/mockData';
 
 export default function ProvincialOfficerPortalPage() {
   const { user } = useAuth();

@@ -11,19 +11,18 @@ import { RoleGuard } from '@/components/auth/RoleGuard';
 import { UserRole } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { initialHospitals, initialDistrictDengueStats } from '@/services/mockData';
 
 export default function DistrictOfficerPortalPage() {
   const { user } = useAuth();
   const districtName = user?.scope?.district || 'Trincomalee';
 
   // Filter institutions strictly to authorized district
-  const districtHospitals = initialHospitals.filter(
+  const districtHospitals = ([] as any[]).filter(
     (h) => h.district.toLowerCase() === districtName.toLowerCase()
   );
 
   // District dengue statistics
-  const dengueStat = initialDistrictDengueStats.find(
+  const dengueStat = ([] as any[]).find(
     (d) => d.district.toLowerCase() === districtName.toLowerCase()
   ) || {
     district: districtName,
@@ -156,3 +155,5 @@ export default function DistrictOfficerPortalPage() {
     </RoleGuard>
   );
 }
+
+
