@@ -1,8 +1,6 @@
-'use client';
-
-import React from 'react';
-import HospitalDetailView from '@/components/hospital/HospitalDetailView';
+import { redirect } from 'next/navigation';
 
 export default function KinniyaHospitalPage() {
-  return <HospitalDetailView hospitalId="hosp-kinniya" isDedicatedKinniyaRoute={true} />;
+  // Redirect the legacy Kinniya URL to the unified dynamic routing architecture
+  redirect('/hospitals/hosp-kinniya');
 }

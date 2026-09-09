@@ -1,7 +1,8 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import { HospitalStatus, SriLankaRegion } from '../types/enums';
+import { HospitalStatus, SriLankaRegion, VerificationStatus } from '../types/enums';
 
 // Official Ministry of Health Sri Lanka Classification
+// Never collapse these into a generic "General Hospital"
 export enum OfficialCategory {
   NATIONAL_HOSPITAL = 'National Hospital',
   TEACHING_HOSPITAL = 'Teaching Hospital',
@@ -16,6 +17,9 @@ export enum OfficialCategory {
   SPECIALIZED_HOSPITAL = 'Specialized Hospital',
   MATERNITY_HOME = 'Maternity Home',
   MEDICAL_OFFICER_OF_HEALTH = 'MOH Office',
+  AYURVEDIC_HOSPITAL = 'Ayurvedic Hospital',
+  ESTATE_HOSPITAL = 'Estate Hospital',
+  ARMED_FORCES_HOSPITAL = 'Armed Forces Hospital',
 }
 
 export enum OwnershipType {
@@ -29,95 +33,177 @@ export enum OwnershipType {
 }
 
 export interface IHospital extends Document {
-  facilityCode: string; // Ministry Unique ID
-  name: string;
+  // ── Identity ─────────────────────────────────────────────────────────────
+  facilityCode: string;          // Ministry Unique Facility Code (primary key from dataset)
+  officialName: string;          // Exact name from Ministry source
+  displayName?: string;          // Localised or simplified display name
+  alternativeNames?: string[];   // Known aliases / former names
+  nameSi?: string;               // Sinhala name
+  nameTa?: string;               // Tamil name
+
+  // ── Classification ────────────────────────────────────────────────────────
   officialCategory: OfficialCategory;
   ownershipType: OwnershipType;
-  
-  // Sri Lankan Geo Hierarchy
+
+  // ── Sri Lankan Geographic Hierarchy ──────────────────────────────────────
   province: SriLankaRegion;
   district: string;
-  mohArea?: string; // Medical Officer of Health Area
-  rdhsArea?: string; // Regional Directorate of Health Services Area
-  
+  rdhsArea?: string;  // Regional Directorate of Health Services Area
+  mohArea?: string;   // Medical Officer of Health Area
+  town?: string;      // Sub-district locality
+
   address: {
     street: string;
     city: string;
     postalCode?: string;
   };
-  coordinates?: { lat: number; lng: number };
-  
-  // Bed statistics (reported vs live)
+
+  // ── Location ──────────────────────────────────────────────────────────────
+  // null when GPS coordinates cannot be verified — NEVER randomly generated
+  coordinates?: {
+    lat: number;
+    lng: number;
+  } | null;
+
+  // ── Contact (public-safe only) ────────────────────────────────────────────
+  telephoneNumbers?: string[];
+  publicEmail?: string | null;
+  officialWebsite?: string | null;
+
+  // ── Services ──────────────────────────────────────────────────────────────
+  departments: string[];
+  publicServices?: string[];         // Verified services available to public
+  emergencyServiceStatus?: string;   // AVAILABLE | UNKNOWN — never fabricated
+
+  // ── Bed Statistics (from published reports — not live telemetry) ──────────
+  // null means figure not in dataset — DO NOT invent
+  publishedBedStrength?: number | null;
+  publishedBedReportingYear?: number | null;
+  // Legacy fields kept for backward compatibility
   totalBeds: number;
-  availableBeds?: number; // Nullable if telemetry not active
+  availableBeds?: number | null;
   icuBedsTotal: number;
-  availableIcuBeds?: number;
-  
+  availableIcuBeds?: number | null;
+
+  // ── Operational Status ────────────────────────────────────────────────────
   emergencyAvailable: boolean;
   status: HospitalStatus;
-  
-  phone?: string;
-  email?: string;
-  website?: string;
+
+  // ── Data Provenance ───────────────────────────────────────────────────────
+  // Reference to DataSource document that this record came from
+  sourceId?: mongoose.Types.ObjectId;
+  sourceName?: string;           // Human-readable: "Ministry of Health Sri Lanka — Annual Health Statistics 2023"
+  sourceUrl?: string;            // URL to the official publication
+  verificationStatus: VerificationStatus;
+  lastVerifiedAt?: Date | null;  // When data was last confirmed against source
+  lastImportedAt?: Date | null;  // When record was last imported/updated from dataset
+
+  // ── Admin ──────────────────────────────────────────────────────────────────
   adminUser?: mongoose.Types.ObjectId;
-  departments: string[];
   accreditation?: string;
-  establishedYear?: number;
-  imageUrl?: string;
-  
+  establishedYear?: number | null;
+  imageUrl?: string | null;
+
   createdAt: Date;
   updatedAt: Date;
 }
 
 const hospitalSchema = new Schema<IHospital>(
   {
-    facilityCode: { type: String, required: true, unique: true, index: true },
-    name: { type: String, required: true, trim: true, index: true },
-    officialCategory: { type: String, enum: Object.values(OfficialCategory), required: true },
+    // ── Identity ────────────────────────────────────────────────────────────
+    facilityCode: { type: String, required: true, unique: true, index: true, trim: true },
+    officialName: { type: String, required: true, trim: true, index: true },
+    displayName: { type: String, trim: true },
+    alternativeNames: [{ type: String, trim: true }],
+    nameSi: { type: String, trim: true },
+    nameTa: { type: String, trim: true },
+
+    // ── Classification ──────────────────────────────────────────────────────
+    officialCategory: {
+      type: String,
+      enum: Object.values(OfficialCategory),
+      required: true,
+      index: true,
+    },
     ownershipType: { type: String, enum: Object.values(OwnershipType), required: true },
+
+    // ── Geographic Hierarchy ────────────────────────────────────────────────
     province: { type: String, enum: Object.values(SriLankaRegion), required: true, index: true },
     district: { type: String, required: true, index: true },
-    mohArea: { type: String },
     rdhsArea: { type: String },
-    
+    mohArea: { type: String },
+    town: { type: String, index: true },
+
     address: {
       street: { type: String, required: true },
       city: { type: String, required: true, index: true },
       postalCode: { type: String },
     },
+
+    // ── Location ────────────────────────────────────────────────────────────
     coordinates: {
       lat: { type: Number },
       lng: { type: Number },
     },
-    
-    totalBeds: { type: Number, required: true, min: 0 },
-    availableBeds: { type: Number, min: 0 },
+
+    // ── Contact ─────────────────────────────────────────────────────────────
+    telephoneNumbers: [{ type: String }],
+    publicEmail: { type: String, default: null },
+    officialWebsite: { type: String, default: null },
+
+    // ── Services ────────────────────────────────────────────────────────────
+    departments: [{ type: String }],
+    publicServices: [{ type: String }],
+    emergencyServiceStatus: { type: String },
+
+    // ── Beds ─────────────────────────────────────────────────────────────────
+    publishedBedStrength: { type: Number, default: null },
+    publishedBedReportingYear: { type: Number, default: null },
+    totalBeds: { type: Number, default: 0, min: 0 },
+    availableBeds: { type: Number, default: null, min: 0 },
     icuBedsTotal: { type: Number, default: 0, min: 0 },
-    availableIcuBeds: { type: Number, min: 0 },
-    
-    emergencyAvailable: { type: Boolean, default: true },
+    availableIcuBeds: { type: Number, default: null, min: 0 },
+
+    // ── Status ──────────────────────────────────────────────────────────────
+    emergencyAvailable: { type: Boolean, default: false },
     status: {
       type: String,
       enum: Object.values(HospitalStatus),
       default: HospitalStatus.OPERATIONAL,
     },
-    phone: { type: String },
-    email: { type: String },
-    website: { type: String },
+
+    // ── Data Provenance ──────────────────────────────────────────────────────
+    sourceId: { type: Schema.Types.ObjectId, ref: 'DataSource' },
+    sourceName: { type: String },
+    sourceUrl: { type: String },
+    verificationStatus: {
+      type: String,
+      enum: Object.values(VerificationStatus),
+      default: VerificationStatus.PENDING,
+      index: true,
+    },
+    lastVerifiedAt: { type: Date, default: null },
+    lastImportedAt: { type: Date, default: null },
+
+    // ── Admin ────────────────────────────────────────────────────────────────
     adminUser: { type: Schema.Types.ObjectId, ref: 'User' },
-    departments: [{ type: String }],
     accreditation: { type: String },
-    establishedYear: { type: Number },
-    imageUrl: { type: String },
+    establishedYear: { type: Number, default: null },
+    imageUrl: { type: String, default: null },
   },
   { timestamps: true }
 );
 
+// ── Indexes ──────────────────────────────────────────────────────────────────
 hospitalSchema.index({ province: 1, status: 1 });
+hospitalSchema.index({ province: 1, district: 1 });
 hospitalSchema.index({ officialCategory: 1 });
+hospitalSchema.index({ district: 1, officialCategory: 1 });
 hospitalSchema.index({ 'address.city': 1 });
-hospitalSchema.index({ district: 1 });
-hospitalSchema.index({ coordinates: '2dsphere' }); // Proper geospatial index
+// Geospatial index for "find near me" — only used for hospitals with verified coordinates
+hospitalSchema.index({ coordinates: '2dsphere' });
 hospitalSchema.index({ emergencyAvailable: 1 });
+hospitalSchema.index({ verificationStatus: 1 });
+hospitalSchema.index({ officialName: 'text', displayName: 'text', alternativeNames: 'text' });
 
 export const Hospital = mongoose.model<IHospital>('Hospital', hospitalSchema);

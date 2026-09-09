@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent } from '@/components/ui/Card';
 import { SourceBadge } from '@/components/ui/SourceBadge';
-import { getMedicineCatalog, MedicineCatalogItem } from '@/services/apiClient';
+import { getMedicineCatalog, MedicineCatalogItem, publicMedicineService } from '@/services/apiClient';
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function MedicinesPage() {
@@ -38,6 +38,25 @@ export default function MedicinesPage() {
       return matchSearch && matchCat;
     });
   }, [catalog, search, selectedCategory]);
+
+  const [inventorySearch, setInventorySearch] = useState('');
+  const [inventoryDistrict, setInventoryDistrict] = useState('');
+  const [inventoryResults, setInventoryResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  const handleInventorySearch = async () => {
+    if (!inventorySearch.trim()) return;
+    setIsSearching(true);
+    try {
+      const res = await publicMedicineService.searchAvailability(inventorySearch, inventoryDistrict || undefined);
+      setInventoryResults(res.data);
+    } catch (err) {
+      console.error('Failed to search inventory:', err);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-12">
@@ -196,19 +215,44 @@ export default function MedicinesPage() {
         </div>
       )}
 
-      {/* TAB 2: MEDICINE INVENTORY (STRICT RULE: NO FAKE LIVE STOCK NUMBERS) */}
+      {/* TAB 2: MEDICINE INVENTORY */}
       {activeTab === 'inventory' && (
         <div className="space-y-4">
           <div className="p-6 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/80 text-amber-900 dark:text-amber-200 space-y-2">
             <div className="flex items-center gap-2 font-bold text-sm">
               <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
-              <span>Hospital-level live medicine stock is not currently available from public sensors.</span>
+              <span>Real-time availability search from verified institutions.</span>
             </div>
             <p className="text-xs text-amber-800/90 dark:text-amber-300/90 leading-relaxed">
-              In accordance with Ministry of Health data governance standards, pharmaceutical stock counts
-              are not fabricated or estimated. Real-time telemetry requires an authorized institutional integration
-              with the Medical Supplies Division (MSD) Swastha logistics system. Below are verified baseline facility records reported by participating institutions.
+              Query the availability of essential medicines across participating hospitals. Data is sourced from official institutional records.
             </p>
+          </div>
+
+          <div className="rounded-xl bg-white dark:bg-slate-900 p-4 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row gap-3">
+            <div className="flex-1 relative">
+              <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search by generic drug name..."
+                value={inventorySearch}
+                onChange={(e) => setInventorySearch(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleInventorySearch()}
+                className="w-full h-10 pl-9 pr-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-teal-500"
+              />
+            </div>
+            <div className="sm:w-48">
+              <input
+                type="text"
+                placeholder="District (Optional)"
+                value={inventoryDistrict}
+                onChange={(e) => setInventoryDistrict(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleInventorySearch()}
+                className="w-full h-10 px-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-teal-500"
+              />
+            </div>
+            <Button onClick={handleInventorySearch} disabled={isSearching || !inventorySearch.trim()}>
+              {isSearching ? 'Searching...' : 'Search Availability'}
+            </Button>
           </div>
 
           {/* Hospital-specific inventory tracking */}
@@ -219,17 +263,6 @@ export default function MedicinesPage() {
                   <Building2 className="w-4 h-4 text-teal-600" />
                   Verified Hospital Medicine Inventories
                 </h3>
-                <p className="text-xs text-slate-500">
-                  Batch tracking and reserve levels reported by Base Hospital Kinniya, National Hospital of Sri Lanka, and Kandy Teaching Hospital.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2 text-xs">
-                <Link href="/hospitals/kinniya">
-                  <Button variant="outline" size="sm" className="text-xs">
-                    View Kinniya Pharmacy
-                  </Button>
-                </Link>
               </div>
             </div>
 
@@ -239,59 +272,32 @@ export default function MedicinesPage() {
                   <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-400">
                     <th className="py-2.5 px-3">Medicine</th>
                     <th className="py-2.5 px-3">Hospital Facility</th>
-                    <th className="py-2.5 px-3">Batch Number</th>
-                    <th className="py-2.5 px-3">Depot Location</th>
-                    <th className="py-2.5 px-3">Stock Units</th>
-                    <th className="py-2.5 px-3">Expiry Date</th>
-                    <th className="py-2.5 px-3">MSD Alert Status</th>
+                    <th className="py-2.5 px-3">District</th>
+                    <th className="py-2.5 px-3">Available Quantity</th>
+                    <th className="py-2.5 px-3">Alert Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                    <td className="py-2.5 px-3 font-bold text-slate-900 dark:text-slate-100">Amoxicillin 500mg Capsule</td>
-                    <td className="py-2.5 px-3 text-teal-600 font-semibold">Base Hospital Kinniya</td>
-                    <td className="py-2.5 px-3 font-mono text-slate-400">AMX-2026-091</td>
-                    <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300">Dispensary Store A</td>
-                    <td className="py-2.5 px-3 font-semibold">1,200 capsules</td>
-                    <td className="py-2.5 px-3 font-mono text-slate-500">2027-06-30</td>
-                    <td className="py-2.5 px-3"><Badge variant="emerald" size="sm">ADEQUATE</Badge></td>
-                  </tr>
-                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                    <td className="py-2.5 px-3 font-bold text-slate-900 dark:text-slate-100">Paracetamol 500mg Tablet</td>
-                    <td className="py-2.5 px-3 text-teal-600 font-semibold">Base Hospital Kinniya</td>
-                    <td className="py-2.5 px-3 font-mono text-slate-400">PCM-2026-112</td>
-                    <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300">OPD Pharmacy Depot</td>
-                    <td className="py-2.5 px-3 font-semibold">850 tablets</td>
-                    <td className="py-2.5 px-3 font-mono text-slate-500">2027-12-31</td>
-                    <td className="py-2.5 px-3"><Badge variant="amber" size="sm">LOW_STOCK</Badge></td>
-                  </tr>
-                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                    <td className="py-2.5 px-3 font-bold text-slate-900 dark:text-slate-100">Metformin 500mg Tablet</td>
-                    <td className="py-2.5 px-3 text-teal-600 font-semibold">Base Hospital Kinniya</td>
-                    <td className="py-2.5 px-3 font-mono text-slate-400">MET-2026-044</td>
-                    <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300">Chronic NCD Store</td>
-                    <td className="py-2.5 px-3 font-semibold text-rose-600 font-bold">120 tablets</td>
-                    <td className="py-2.5 px-3 font-mono text-slate-500">2026-11-30</td>
-                    <td className="py-2.5 px-3"><Badge variant="rose" size="sm">CRITICAL</Badge></td>
-                  </tr>
-                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                    <td className="py-2.5 px-3 font-bold text-slate-900 dark:text-slate-100">Insulin Human 100 IU/ml Vial</td>
-                    <td className="py-2.5 px-3 text-slate-800 dark:text-slate-200">National Hospital of Sri Lanka</td>
-                    <td className="py-2.5 px-3 font-mono text-slate-400">INS-2026-883</td>
-                    <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300">Cold Chain Refrigerator 01</td>
-                    <td className="py-2.5 px-3 font-semibold">1,450 vials</td>
-                    <td className="py-2.5 px-3 font-mono text-slate-500">2026-10-15</td>
-                    <td className="py-2.5 px-3"><Badge variant="emerald" size="sm">ADEQUATE</Badge></td>
-                  </tr>
-                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                    <td className="py-2.5 px-3 font-bold text-slate-900 dark:text-slate-100">Salbutamol Inhaler 100mcg</td>
-                    <td className="py-2.5 px-3 text-slate-800 dark:text-slate-200">National Hospital of Sri Lanka</td>
-                    <td className="py-2.5 px-3 font-mono text-slate-400">SAL-2026-092</td>
-                    <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300">Respiratory Unit Store</td>
-                    <td className="py-2.5 px-3 font-semibold text-amber-600">80 canisters</td>
-                    <td className="py-2.5 px-3 font-mono text-slate-500">2027-01-20</td>
-                    <td className="py-2.5 px-3"><Badge variant="amber" size="sm">LOW_STOCK</Badge></td>
-                  </tr>
+                  {inventoryResults.map((inv, idx) => (
+                    <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                      <td className="py-2.5 px-3 font-bold text-slate-900 dark:text-slate-100">{inv.medicineName}</td>
+                      <td className="py-2.5 px-3 text-teal-600 font-semibold">{inv.hospitalName}</td>
+                      <td className="py-2.5 px-3">{inv.district}</td>
+                      <td className="py-2.5 px-3 font-semibold">{inv.availableQuantity}</td>
+                      <td className="py-2.5 px-3">
+                        <Badge variant={inv.status === 'CRITICAL' ? 'rose' : inv.status === 'LOW_STOCK' ? 'amber' : 'emerald'} size="sm">
+                          {inv.status}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                  {inventoryResults.length === 0 && !isSearching && (
+                    <tr>
+                      <td colSpan={5} className="py-8 text-center text-slate-500">
+                        {inventorySearch ? 'No availability found.' : 'Enter a medicine name to check availability.'}
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

@@ -13,7 +13,7 @@ import { UserRole } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { useToast } from '@/context/ToastContext';
-import { auditLogService } from '@/services/apiClient';
+import { auditLogService, hospitalInventoryService } from '@/services/apiClient';
 
 export default function PharmacistPortalPage() {
   const { user } = useAuth();
@@ -23,9 +23,12 @@ export default function PharmacistPortalPage() {
   const assignedHospitalName = user?.organization || 'Base Hospital Kinniya';
 
   // Scoped strictly to assigned hospital pharmacy
-  const [inventory, setInventory] = useState(
-    ([] as any[]).filter((inv) => inv.hospitalId === assignedHospitalId)
-  );
+  const [inventory, setInventory] = useState<any[]>([]);
+
+  React.useEffect(() => {
+    // Initial fetch of inventory
+    setInventory(hospitalInventoryService.getByHospital(assignedHospitalId));
+  }, [assignedHospitalId]);
 
   const [search, setSearch] = useState('');
   const [showRequisitionModal, setShowRequisitionModal] = useState(false);

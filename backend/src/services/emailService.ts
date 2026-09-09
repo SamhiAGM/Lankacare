@@ -4,16 +4,17 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_PROVIDER_HOST || 'smtp.example.com',
-  port: parseInt(process.env.EMAIL_PROVIDER_PORT || '587', 10),
-  secure: process.env.EMAIL_PROVIDER_SECURE === 'true',
+  host: process.env.SMTP_HOST || process.env.EMAIL_PROVIDER_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.SMTP_PORT || process.env.EMAIL_PROVIDER_PORT || '587', 10),
+  secure: process.env.SMTP_SECURE === 'true' || process.env.EMAIL_PROVIDER_SECURE === 'true',
   auth: {
-    user: process.env.EMAIL_PROVIDER_USER || '',
-    pass: process.env.EMAIL_PROVIDER_PASS || process.env.EMAIL_PROVIDER_API_KEY || '',
+    user: process.env.SMTP_USER || process.env.EMAIL_PROVIDER_USER || 'samhiag9958@gmail.com',
+    pass: process.env.SMTP_PASS || process.env.EMAIL_PROVIDER_PASS || process.env.EMAIL_PROVIDER_API_KEY || '',
   },
 });
 
-const FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS || 'no-reply@lankacare.gov.lk';
+const SMTP_USER = process.env.SMTP_USER || process.env.EMAIL_PROVIDER_USER || 'samhiag9958@gmail.com';
+const FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS || SMTP_USER;
 const FROM_NAME = process.env.EMAIL_FROM_NAME || 'LankaCare';
 
 /**
@@ -21,9 +22,9 @@ const FROM_NAME = process.env.EMAIL_FROM_NAME || 'LankaCare';
  */
 export const sendPasswordResetOtpEmail = async (toEmail: string, otp: string, expiryMinutes: number): Promise<boolean> => {
   try {
-    if (!process.env.EMAIL_PROVIDER_USER && !process.env.EMAIL_PROVIDER_API_KEY) {
-      console.warn('EMAIL_PROVIDER credentials missing. Email OTP simulated but NOT sent.');
-      return false; // Return false to indicate it wasn't actually sent in production
+    if (!process.env.SMTP_PASS && !process.env.EMAIL_PROVIDER_PASS && !process.env.EMAIL_PROVIDER_API_KEY) {
+      console.error('SMTP credentials are not configured; password reset email was not sent.');
+      return false;
     }
 
     const mailOptions = {
@@ -60,7 +61,7 @@ export const sendPasswordResetOtpEmail = async (toEmail: string, otp: string, ex
  */
 export const sendPasswordChangeNotificationEmail = async (toEmail: string): Promise<boolean> => {
   try {
-    if (!process.env.EMAIL_PROVIDER_USER && !process.env.EMAIL_PROVIDER_API_KEY) {
+    if (!process.env.SMTP_PASS && !process.env.EMAIL_PROVIDER_PASS && !process.env.EMAIL_PROVIDER_API_KEY) {
       return false;
     }
 

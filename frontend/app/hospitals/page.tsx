@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/Badge';
 import { SourceBadge } from '@/components/ui/SourceBadge';
 import { Modal } from '@/components/ui/Modal';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { SriLankaMap } from '@/components/map/SriLankaMap';
+import { SriLankaHealthMap } from '@/components/map/SriLankaHealthMap';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { hospitalService, getHospitals } from '@/services/apiClient';
@@ -334,17 +334,10 @@ export default function HospitalsDirectoryPage() {
       {/* VIEW MODE 1: INTERACTIVE SRI LANKA MAP */}
       {viewMode === 'map' && (
         <div className="space-y-4">
-          <SriLankaMap
+          <SriLankaHealthMap
             hospitals={filteredHospitals}
             selectedProvince={selectedProvince}
-            onSelectProvince={(p) => {
-              setSelectedProvince(p);
-              setSelectedDistrict('ALL');
-            }}
             selectedDistrict={selectedDistrict}
-            onSelectDistrict={(d) => setSelectedDistrict(d)}
-            mode="facilities"
-            height={560}
           />
         </div>
       )}

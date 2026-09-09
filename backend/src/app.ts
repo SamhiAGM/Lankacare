@@ -26,6 +26,10 @@ import complaintRoutes from './routes/complaintRoutes';
 import announcementRoutes from './routes/announcementRoutes';
 import campaignRoutes from './routes/campaignRoutes';
 import reportRoutes from './routes/reportRoutes';
+import publicRoutes from './routes/publicRoutes';
+import practitionerRoutes from './routes/practitionerRoutes';
+import queueRoutes from './routes/queueRoutes';
+import inventoryRoutes from './routes/inventoryRoutes';
 
 const app = express();
 
@@ -177,6 +181,10 @@ app.get('/api/health', (_req, res) => {
 });
 
 // ── API Routes ────────────────────────────────────────────────────────────────
+app.use('/api/public', publicRoutes);
+app.use('/api/practitioners', practitionerRoutes);
+app.use('/api/queue', queueRoutes);
+app.use('/api/inventory', inventoryRoutes);
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/hospitals', hospitalRoutes);
 app.use('/api/doctors', doctorRoutes);

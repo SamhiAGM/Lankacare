@@ -1415,6 +1415,76 @@ export const auditLogService = {
   },
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+// 🇱🇰 LANKACARE VERIFIED DATA PIPELINES (PHASE 5)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const publicHospitalService = {
+  async search(params: Record<string, string>): Promise<{ data: any[], meta: any, pagination: any }> {
+    const queryParams = new URLSearchParams(params).toString();
+    const res = await fetch(`${API_BASE}/public/hospitals?${queryParams}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch hospitals');
+    return res.json();
+  },
+  async getById(id: string): Promise<{ data: any, meta: any }> {
+    const res = await fetch(`${API_BASE}/public/hospitals/${id}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch hospital');
+    return res.json();
+  },
+  async getNear(lat: number, lng: number, radius = 10, service?: string): Promise<{ data: any[], meta: any }> {
+    const url = new URL(`${API_BASE}/public/hospitals/near`);
+    url.searchParams.append('lat', lat.toString());
+    url.searchParams.append('lng', lng.toString());
+    url.searchParams.append('radius', radius.toString());
+    if (service) url.searchParams.append('service', service);
+    const res = await fetch(url.toString(), { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch nearby hospitals');
+    return res.json();
+  },
+  async getProvinces(): Promise<{ data: any[] }> {
+    const res = await fetch(`${API_BASE}/public/provinces`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch provinces');
+    return res.json();
+  },
+  async getDistricts(): Promise<{ data: any[] }> {
+    const res = await fetch(`${API_BASE}/public/districts`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch districts');
+    return res.json();
+  }
+};
+
+export const publicMedicineService = {
+  async searchAvailability(name: string, district?: string): Promise<{ data: any[], meta: any, matchedMedicines: any[] }> {
+    const url = new URL(`${API_BASE}/public/medicine-availability`);
+    url.searchParams.append('name', name);
+    if (district) url.searchParams.append('district', district);
+    const res = await fetch(url.toString(), { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to search medicine availability');
+    return res.json();
+  }
+};
+
+export const verifiedPractitionerService = {
+  async getBySlmc(slmc: string): Promise<{ data: any }> {
+    const res = await fetch(`${API_BASE}/practitioners/${slmc}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch practitioner');
+    return res.json();
+  },
+  async getAssignments(id: string): Promise<{ data: any[] }> {
+    const res = await fetch(`${API_BASE}/practitioners/${id}/assignments`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch practitioner assignments');
+    return res.json();
+  }
+};
+
+export const queueManagementService = {
+  async getPublicStatus(hospitalId: string, department: string): Promise<{ data: any }> {
+    const res = await fetch(`${API_BASE}/queue/${hospitalId}/${department}/status`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch queue status');
+    return res.json();
+  }
+};
+
 export const apiClient = {
   async post(url: string, data: any) {
     const res = await fetch(`${API_BASE}${url}`, {

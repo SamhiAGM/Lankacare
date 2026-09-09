@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { SourceBadge } from '@/components/ui/SourceBadge';
-import { getHospitals } from '@/services/apiClient';
+import { publicHospitalService } from '@/services/apiClient';
 import { Hospital, SriLankaHospitalCategory, SriLankaRegion } from '@/types';
 import {
   SRI_LANKA_PROVINCES, SRI_LANKA_DISTRICTS,
@@ -22,7 +22,23 @@ import { RoleGuard } from '@/components/auth/RoleGuard';
 
 export default function FindCarePage() {
   const { t } = useLanguage();
-  const hospitals = useMemo(() => getHospitals(), []);
+  const [hospitals, setHospitals] = useState<Hospital[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  React.useEffect(() => {
+    const fetchHospitals = async () => {
+      try {
+        setIsLoading(true);
+        const res = await publicHospitalService.search({ limit: '1000' });
+        setHospitals(res.data);
+      } catch (err) {
+        console.error('Failed to fetch hospitals:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchHospitals();
+  }, []);
 
   // Wizard state
   const [selectedProvince, setSelectedProvince] = useState<string>('ALL');

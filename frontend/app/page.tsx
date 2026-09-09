@@ -149,7 +149,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto relative z-10 text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-300 text-xs font-semibold backdrop-blur-xs animate-in fade-in">
             <Sparkles className="w-3.5 h-3.5 text-teal-400" />
-            <span>Sri Lanka Digital Health Coordination Platform</span>
+            <span>LankaCare — Check Before You Travel</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight max-w-4xl mx-auto leading-tight sm:leading-tight">
@@ -160,8 +160,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-sm sm:text-base lg:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            Find verified healthcare information, explore healthcare facilities and access trusted
-            public-health resources across all 9 provinces and 25 districts.
+            Check real-time hospital queues, verified service availability, and essential medicine stock across all 9 provinces and 25 districts before you leave home. Reduce unnecessary travel and crowding.
           </p>
 
           {/* 3 Main Action Buttons (Requirement 41) */}

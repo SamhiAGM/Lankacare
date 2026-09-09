@@ -67,6 +67,7 @@ export enum MedicineStatus {
   CRITICAL = 'CRITICAL',
   OUT_OF_STOCK = 'OUT_OF_STOCK',
   EXPIRED = 'EXPIRED',
+  UNKNOWN = 'UNKNOWN', // No current inventory data — honest state
 }
 
 export enum AlertLevel {
@@ -139,6 +140,7 @@ export enum AuditAction {
   ANNOUNCEMENT_PUBLISH = 'ANNOUNCEMENT_PUBLISH',
   HOSPITAL_CREATE = 'HOSPITAL_CREATE',
   HOSPITAL_UPDATE = 'HOSPITAL_UPDATE',
+  HOSPITAL_IMPORT = 'HOSPITAL_IMPORT',
   ADMIN_ACTION = 'ADMIN_ACTION',
   PASSWORD_RESET_REQUESTED = 'PASSWORD_RESET_REQUESTED',
   OTP_SENT = 'OTP_SENT',
@@ -146,6 +148,25 @@ export enum AuditAction {
   OTP_VERIFIED = 'OTP_VERIFIED',
   PASSWORD_RESET_COMPLETED = 'PASSWORD_RESET_COMPLETED',
   PASSWORD_RESET_RATE_LIMITED = 'PASSWORD_RESET_RATE_LIMITED',
+  // Inventory
+  INVENTORY_UPDATE = 'INVENTORY_UPDATE',
+  INVENTORY_CREATE = 'INVENTORY_CREATE',
+  INVENTORY_DELETE = 'INVENTORY_DELETE',
+  // Queue
+  QUEUE_TOKEN_CREATE = 'QUEUE_TOKEN_CREATE',
+  QUEUE_TOKEN_UPDATE = 'QUEUE_TOKEN_UPDATE',
+  // Practitioner
+  PRACTITIONER_CREATE = 'PRACTITIONER_CREATE',
+  PRACTITIONER_VERIFY = 'PRACTITIONER_VERIFY',
+  PRACTITIONER_UPDATE = 'PRACTITIONER_UPDATE',
+  STAFF_ASSIGNMENT_CREATE = 'STAFF_ASSIGNMENT_CREATE',
+  STAFF_ASSIGNMENT_UPDATE = 'STAFF_ASSIGNMENT_UPDATE',
+  // Data quality
+  DATA_CORRECTION_SUBMIT = 'DATA_CORRECTION_SUBMIT',
+  DATA_CORRECTION_RESOLVE = 'DATA_CORRECTION_RESOLVE',
+  DATA_SOURCE_CREATE = 'DATA_SOURCE_CREATE',
+  // Service availability
+  SERVICE_AVAILABILITY_UPDATE = 'SERVICE_AVAILABILITY_UPDATE',
 }
 
 export enum SriLankaRegion {
@@ -158,4 +179,78 @@ export enum SriLankaRegion {
   NORTH_CENTRAL = 'NORTH_CENTRAL',
   UVA = 'UVA',
   SABARAGAMUWA = 'SABARAGAMUWA',
+}
+
+// ── New enums for the Sri Lanka healthcare upgrade ────────────────────────────
+
+export enum VerificationStatus {
+  VERIFIED = 'VERIFIED',       // Confirmed against authoritative source
+  PENDING = 'PENDING',         // Awaiting verification
+  HISTORICAL = 'HISTORICAL',   // Data from a past report; may be outdated
+  UNVERIFIED = 'UNVERIFIED',   // Source unknown or not validated
+}
+
+export enum ServiceAvailabilityStatus {
+  AVAILABLE = 'AVAILABLE',
+  SCHEDULED = 'SCHEDULED',
+  TEMPORARILY_UNAVAILABLE = 'TEMPORARILY_UNAVAILABLE',
+  UNKNOWN = 'UNKNOWN', // No current status information — never fabricated
+}
+
+export enum QueueStatus {
+  BOOKED = 'BOOKED',
+  CHECKED_IN = 'CHECKED_IN',
+  WAITING = 'WAITING',
+  CALLED = 'CALLED',
+  IN_SERVICE = 'IN_SERVICE',
+  COMPLETED = 'COMPLETED',
+  MISSED = 'MISSED',
+  CANCELLED = 'CANCELLED',
+}
+
+/**
+ * Freshness of medicine inventory data.
+ * Thresholds are configurable per hospital / deployment policy.
+ * Defaults: CURRENT <30min, RECENT <4h, TODAY <24h, STALE >=24h
+ */
+export enum FreshnessStatus {
+  CURRENT = 'CURRENT',
+  RECENT = 'RECENT',
+  TODAY = 'TODAY',
+  STALE = 'STALE',
+  UNKNOWN = 'UNKNOWN', // No update timestamp available
+}
+
+export enum DataSourceType {
+  OFFICIAL_GOVERNMENT = 'OFFICIAL_GOVERNMENT',
+  REGULATOR = 'REGULATOR',
+  AUTHORIZED_HOSPITAL = 'AUTHORIZED_HOSPITAL',
+  AUTHORIZED_PROVINCIAL = 'AUTHORIZED_PROVINCIAL',
+  USER_SUBMITTED = 'USER_SUBMITTED',
+  SYSTEM_CALCULATED = 'SYSTEM_CALCULATED',
+}
+
+/** Sri Lanka Medical Council practitioner registration status */
+export enum SlmcRegistrationStatus {
+  ACTIVE = 'ACTIVE',
+  LAPSED = 'LAPSED',
+  CANCELLED = 'CANCELLED',
+  UNKNOWN = 'UNKNOWN',
+}
+
+/** Crowd level derived from actual queue data — never fabricated */
+export enum CrowdLevel {
+  LOW = 'LOW',
+  MODERATE = 'MODERATE',
+  BUSY = 'BUSY',
+  VERY_BUSY = 'VERY_BUSY',
+  UNKNOWN = 'UNKNOWN',
+}
+
+export enum DataCorrectionStatus {
+  SUBMITTED = 'SUBMITTED',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  VERIFIED_AGAINST_SOURCE = 'VERIFIED_AGAINST_SOURCE',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
 }
