@@ -11,13 +11,17 @@ const transporter = nodemailer.createTransport({
 
 export async function POST(request: Request) {
   try {
-    const { email, otp, appName } = await request.json();
+    const { email, phone, otp, appName } = await request.json();
 
     if (!email || !otp) {
       return NextResponse.json(
         { error: 'Email and OTP are required' },
         { status: 400 }
       );
+    }
+
+    if (phone) {
+      console.log(`[SMS MOCK] Sending OTP ${otp} to phone number ${phone}`);
     }
 
     const mailOptions = {

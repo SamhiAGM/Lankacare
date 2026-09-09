@@ -51,7 +51,7 @@ export default function ForgotPasswordPage() {
       const res = await fetch('/api/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp, appName: 'LankaCare' })
+        body: JSON.stringify({ email, phone: user.phone, otp, appName: 'LankaCare' })
       });
 
       if (!res.ok) throw new Error('Failed to dispatch secure email.');
