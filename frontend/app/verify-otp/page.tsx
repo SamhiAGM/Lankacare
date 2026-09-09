@@ -23,14 +23,17 @@ export default function VerifyOtpPage() {
   
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
+  const [isReady, setIsReady] = useState(false);
+
   useEffect(() => {
     const savedIdentifier = sessionStorage.getItem('reset_identifier');
     if (!savedIdentifier) {
-      router.push('/forgot-password');
+      setIsReady(false);
     } else {
       setIdentifier(savedIdentifier);
+      setIsReady(true);
     }
-  }, [router]);
+  }, []);
 
   useEffect(() => {
     if (countdown > 0) {
@@ -144,6 +147,17 @@ export default function VerifyOtpPage() {
     const s = seconds % 60;
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
+
+  if (!isReady) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center items-center bg-slate-900 text-slate-100 gap-4 p-6">
+        <p className="text-slate-400 text-sm">Session expired or page was refreshed.</p>
+        <Link href="/forgot-password" className="text-teal-400 font-semibold hover:underline text-sm">
+          ← Start again from Forgot Password
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-slate-900 text-slate-100 relative overflow-hidden">

@@ -92,12 +92,29 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
       requestIpHash,
     });
 
-    // Send OTP asynchronously
+    // Send OTP via configured provider
+    let delivered = false;
     if (channel === OtpChannel.EMAIL) {
-      await sendPasswordResetOtpEmail(destination, rawOtp, OTP_EXPIRY_MINUTES);
+      delivered = await sendPasswordResetOtpEmail(destination, rawOtp, OTP_EXPIRY_MINUTES);
     } else {
-      await sendPasswordResetOtpSms(destination, rawOtp, OTP_EXPIRY_MINUTES);
+      delivered = await sendPasswordResetOtpSms(destination, rawOtp, OTP_EXPIRY_MINUTES);
     }
+
+    // DEV MODE: Log OTP to console when provider is not configured.
+    // This must NEVER be enabled in production.
+    const isDevMode = process.env.NODE_ENV !== 'production';
+    if (!delivered && isDevMode) {
+      console.log('\n╔══════════════════════════════════════════════╗');
+      console.log('║   🔐 DEV MODE — OTP NOT SENT VIA PROVIDER   ║');
+      console.log('╠══════════════════════════════════════════════╣');
+      console.log(`║   Destination : ${destination.padEnd(29)}║`);
+      console.log(`║   OTP Code    : ${rawOtp.padEnd(29)}║`);
+      console.log(`║   Expires in  : ${String(OTP_EXPIRY_MINUTES + ' minutes').padEnd(29)}║`);
+      console.log('║   Configure EMAIL_PROVIDER_* in .env to      ║');
+      console.log('║   send real emails in production.             ║');
+      console.log('╚══════════════════════════════════════════════╝\n');
+    }
+
 
     // Audit log
     await AuditLog.create({
