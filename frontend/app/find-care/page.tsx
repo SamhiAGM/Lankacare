@@ -24,15 +24,18 @@ export default function FindCarePage() {
   const { t } = useLanguage();
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   React.useEffect(() => {
     const fetchHospitals = async () => {
       try {
         setIsLoading(true);
+        setLoadError('');
         const res = await publicHospitalService.search({ limit: '1000' });
         setHospitals(res.data);
       } catch (err) {
         console.error('Failed to fetch hospitals:', err);
+        setLoadError('We could not connect to the hospital directory. Please ensure the API is running and try again.');
       } finally {
         setIsLoading(false);
       }
@@ -250,7 +253,16 @@ export default function FindCarePage() {
       </div>
 
       {/* Matching Facility Cards */}
-      {matchingHospitals.length === 0 ? (
+      {loadError ? (
+        <div className="p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-900 space-y-3">
+          <AlertCircle className="w-10 h-10 text-rose-500 mx-auto" />
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">Hospital directory unavailable</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">{loadError}</p>
+          <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
+        </div>
+      ) : matchingHospitals.length === 0 ? (
         <div className="p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
           <AlertCircle className="w-10 h-10 text-amber-500 mx-auto" />
           <h3 className="text-base font-bold text-slate-900 dark:text-white">
